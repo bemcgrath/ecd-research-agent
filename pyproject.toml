@@ -26,6 +26,7 @@ ecd-strategy = "ecd_research.strategy_cli:main"
 ecd-trials = "ecd_research.trials_cli:main"
 ecd-research = "ecd_research.research_cli:main"
 ecd-report = "ecd_research.report_cli:main"
+ecd-cases = "ecd_research.cases_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

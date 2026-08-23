@@ -93,6 +93,12 @@ Generate a critiqued research report:
 python -m ecd_research.report_cli --question "What is the current evidence for treating neurological involvement in Erdheim-Chester disease, and how does molecular status affect treatment evidence?" --mode deep --output research_report.md
 ```
 
+Aggregate structured fields across case reports:
+
+```bash
+python -m ecd_research.cases_cli --question "Across published CNS-ECD cases, what does the literature report about timing of BRAF/MEK-targeted therapy and neurologic outcomes?" --output case_corpus_report.md
+```
+
 Other CLIs: query expansion (`strategy_cli`), trials (`trials_cli`), multi-round search (`research_cli`), single-paper evidence (`evidence_cli`). See the [user guide](docs/USER_GUIDE.md).
 
 ### Tests
@@ -113,7 +119,7 @@ pytest
 | ClinicalTrials.gov API v2 | Available |
 | Multi-round research loop (Quick/Deep) | Available |
 | Evidence critic + synthesis report | Available |
-| Case corpus aggregation (structured case series) | Planned (M9) |
+| Case corpus aggregation (structured case series) | Available (`cases_cli`) |
 | Streamlit UI / full-text / Agents SDK | Not yet |
 
 ## Join the effort

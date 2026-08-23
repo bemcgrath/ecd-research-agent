@@ -8,10 +8,13 @@ from datetime import datetime, timezone
 from typing import Any
 
 from ecd_research.models import (
+    CaseRecord,
+    DiseaseLabel,
     EvidenceRecord,
     EvidenceStrength,
     PubMedArticle,
     StudyType,
+    TherapyTiming,
 )
 from ecd_research.storage.database import connect
 
@@ -242,6 +245,127 @@ class EvidenceRepository:
     def count_evidence(self) -> int:
         row = self.conn.execute("SELECT COUNT(*) AS n FROM evidence_records").fetchone()
         return int(row["n"]) if row else 0
+
+    def save_case_record(
+        self,
+        record: CaseRecord,
+        *,
+        question_id: int | None = None,
+        run_id: int | None = None,
+    ) -> int:
+        if record.validation_status != "validated":
+            raise ValueError(
+                "only validated case records may be stored "
+                f"(got {record.validation_status!r})"
+            )
+        now = _utcnow()
+        cns_val: int | None
+        if record.cns_involvement is True:
+            cns_val = 1
+        elif record.cns_involvement is False:
+            cns_val = 0
+        else:
+            cns_val = None
+
+        cur = self.conn.execute(
+            """
+            INSERT INTO case_records (
+                pmid, question_id, run_id, source_title, source_url,
+                publication_date, journal, doi, disease_label, case_count,
+                organ_involvement_json, cns_involvement, mutation,
+                therapies_json, symptoms_to_diagnosis, diagnosis_to_treatment,
+                therapy_timing, neurologic_outcome, other_outcomes,
+                supporting_text, source_fields_used_json, limitations_json,
+                abstract_limited, extractor_model, extractor_prompt_version,
+                validation_status, created_at, validated_at
+            ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+            """,
+            (
+                record.pmid,
+                question_id,
+                run_id,
+                record.source_title,
+                record.source_url,
+                record.publication_date,
+                record.journal,
+                record.doi,
+                record.disease_label.value if record.disease_label else None,
+                record.case_count,
+                _json_list(record.organ_involvement),
+                cns_val,
+                record.mutation,
+                _json_list(record.therapies),
+                record.symptoms_to_diagnosis,
+                record.diagnosis_to_treatment,
+                record.therapy_timing.value if record.therapy_timing else None,
+                record.neurologic_outcome,
+                record.other_outcomes,
+                record.supporting_text,
+                _json_list(list(record.source_fields_used)),
+                _json_list(record.limitations),
+                1 if record.abstract_limited else 0,
+                record.extractor_model,
+                record.extractor_prompt_version,
+                record.validation_status,
+                now,
+                now,
+            ),
+        )
+        self.conn.commit()
+        return int(cur.lastrowid)
+
+    def list_case_records_for_question(self, question_id: int) -> list[CaseRecord]:
+        rows = self.conn.execute(
+            "SELECT * FROM case_records WHERE question_id = ? ORDER BY id",
+            (question_id,),
+        ).fetchall()
+        return [self._row_to_case(row) for row in rows]
+
+    def count_case_records(self) -> int:
+        row = self.conn.execute("SELECT COUNT(*) AS n FROM case_records").fetchone()
+        return int(row["n"]) if row else 0
+
+    @staticmethod
+    def _row_to_case(row: sqlite3.Row) -> CaseRecord:
+        disease_raw = row["disease_label"]
+        disease_label = DiseaseLabel(disease_raw) if disease_raw else None
+        timing_raw = row["therapy_timing"]
+        therapy_timing = TherapyTiming(timing_raw) if timing_raw else None
+        cns_raw = row["cns_involvement"]
+        cns_involvement: bool | None
+        if cns_raw is None:
+            cns_involvement = None
+        else:
+            cns_involvement = bool(cns_raw)
+        fields = _load_json_list(row["source_fields_used_json"])
+        return CaseRecord(
+            pmid=row["pmid"],
+            source_title=row["source_title"],
+            source_url=row["source_url"],
+            publication_date=row["publication_date"],
+            journal=row["journal"],
+            doi=row["doi"],
+            disease_label=disease_label,
+            case_count=row["case_count"],
+            organ_involvement=_load_json_list(row["organ_involvement_json"]),
+            cns_involvement=cns_involvement,
+            mutation=row["mutation"],
+            therapies=_load_json_list(row["therapies_json"]),
+            symptoms_to_diagnosis=row["symptoms_to_diagnosis"],
+            diagnosis_to_treatment=row["diagnosis_to_treatment"],
+            therapy_timing=therapy_timing,
+            neurologic_outcome=row["neurologic_outcome"],
+            other_outcomes=row["other_outcomes"],
+            supporting_text=row["supporting_text"],
+            source_fields_used=fields,  # type: ignore[arg-type]
+            limitations=_load_json_list(row["limitations_json"]),
+            abstract_limited=bool(row["abstract_limited"]),
+            extractor_model=row["extractor_model"],
+            extractor_prompt_version=row["extractor_prompt_version"],
+            validation_status=row["validation_status"],
+        )
 
     @staticmethod
     def _row_to_evidence(row: sqlite3.Row) -> EvidenceRecord:

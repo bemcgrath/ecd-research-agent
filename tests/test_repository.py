@@ -6,10 +6,13 @@ import pytest
 
 from ecd_research.evidence.extractor import EXTRACTOR_PROMPT_VERSION
 from ecd_research.models import (
+    CaseRecord,
+    DiseaseLabel,
     EvidenceRecord,
     EvidenceStrength,
     PubMedArticle,
     StudyType,
+    TherapyTiming,
 )
 from ecd_research.storage import EvidenceRepository
 
@@ -119,3 +122,50 @@ def test_evidence_requires_article_foreign_key(tmp_path) -> None:
     with EvidenceRepository(str(db)) as repo:
         with pytest.raises(Exception):
             repo.save_evidence_record(record)
+
+
+def _validated_case_record() -> CaseRecord:
+    article = _article()
+    return CaseRecord(
+        pmid=article.pmid,
+        source_title=article.title,
+        source_url=str(article.pubmed_url),
+        publication_date=article.publication_date,
+        journal=article.journal,
+        doi=article.doi,
+        disease_label=DiseaseLabel.ECD,
+        case_count=1,
+        cns_involvement=True,
+        mutation="BRAF V600E",
+        therapies=["dabrafenib"],
+        neurologic_outcome="improved",
+        supporting_text="Background text about one patient with ECD.",
+        source_fields_used=["abstract"],
+        limitations=["n=1"],
+        abstract_limited=True,
+        extractor_model="test-model",
+        extractor_prompt_version=EXTRACTOR_PROMPT_VERSION,
+        validation_status="validated",
+    )
+
+
+def test_case_record_roundtrip(tmp_path) -> None:
+    db = tmp_path / "test.db"
+    article = _article()
+    record = _validated_case_record()
+
+    with EvidenceRepository(str(db)) as repo:
+        repo.upsert_article(article)
+        qid = repo.get_or_create_question("CNS ECD case timing?")
+        run_id = repo.start_search_run(qid, notes="case test")
+        cid = repo.save_case_record(record, question_id=qid, run_id=run_id)
+        repo.finish_search_run(run_id)
+
+        assert cid >= 1
+        assert repo.count_case_records() == 1
+        loaded = repo.list_case_records_for_question(qid)
+
+    assert len(loaded) == 1
+    assert loaded[0].disease_label == DiseaseLabel.ECD
+    assert loaded[0].mutation == "BRAF V600E"
+    assert loaded[0].validation_status == "validated"

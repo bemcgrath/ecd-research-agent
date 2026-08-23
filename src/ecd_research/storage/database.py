@@ -6,7 +6,7 @@ import os
 import sqlite3
 from pathlib import Path
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS schema_meta (
@@ -88,6 +88,44 @@ CREATE INDEX IF NOT EXISTS idx_evidence_question ON evidence_records(question_id
 CREATE INDEX IF NOT EXISTS idx_evidence_run ON evidence_records(run_id);
 """
 
+CASE_RECORDS_SQL = """
+CREATE TABLE IF NOT EXISTS case_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    pmid TEXT NOT NULL REFERENCES articles(pmid),
+    question_id INTEGER REFERENCES research_questions(id),
+    run_id INTEGER REFERENCES search_runs(id),
+    source_title TEXT,
+    source_url TEXT NOT NULL,
+    publication_date TEXT,
+    journal TEXT,
+    doi TEXT,
+    disease_label TEXT,
+    case_count INTEGER,
+    organ_involvement_json TEXT NOT NULL,
+    cns_involvement INTEGER,
+    mutation TEXT,
+    therapies_json TEXT NOT NULL,
+    symptoms_to_diagnosis TEXT,
+    diagnosis_to_treatment TEXT,
+    therapy_timing TEXT,
+    neurologic_outcome TEXT,
+    other_outcomes TEXT,
+    supporting_text TEXT NOT NULL,
+    source_fields_used_json TEXT NOT NULL,
+    limitations_json TEXT NOT NULL,
+    abstract_limited INTEGER NOT NULL DEFAULT 1,
+    extractor_model TEXT NOT NULL,
+    extractor_prompt_version TEXT NOT NULL,
+    validation_status TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    validated_at TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_case_pmid ON case_records(pmid);
+CREATE INDEX IF NOT EXISTS idx_case_question ON case_records(question_id);
+CREATE INDEX IF NOT EXISTS idx_case_run ON case_records(run_id);
+"""
+
 
 def default_db_path() -> Path:
     """Default DB path: ECD_DB_PATH env, else ./data/ecd_research.db."""
@@ -111,6 +149,7 @@ def connect(db_path: str | Path | None = None) -> sqlite3.Connection:
 def init_schema(conn: sqlite3.Connection) -> None:
     """Create tables if missing and record schema version."""
     conn.executescript(SCHEMA_SQL)
+    conn.executescript(CASE_RECORDS_SQL)
     conn.execute(
         "INSERT INTO schema_meta(key, value) VALUES('version', ?) "
         "ON CONFLICT(key) DO UPDATE SET value=excluded.value",

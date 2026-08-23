@@ -1,0 +1,86 @@
+"""Tests for case corpus orchestration."""
+
+from __future__ import annotations
+
+from ecd_research.cases.corpus import run_case_corpus
+from ecd_research.cases.extractor import EXTRACTOR_PROMPT_VERSION
+from ecd_research.models import (
+    CaseRecord,
+    DiseaseLabel,
+    PubMedArticle,
+    TherapyTiming,
+)
+
+
+def _article(pmid: str) -> PubMedArticle:
+    return PubMedArticle(
+        pmid=pmid,
+        title=f"Case report: CNS ECD patient {pmid}",
+        authors=["Author"],
+        journal="Case Reports",
+        publication_date="2025",
+        abstract=(
+            "We report a patient with CNS Erdheim-Chester disease and BRAF V600E. "
+            "Dabrafenib and trametinib were started early with neurologic improvement."
+        ),
+        doi=None,
+        pubmed_url=f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/",
+    )
+
+
+def _case_record(pmid: str) -> CaseRecord:
+    article = _article(pmid)
+    return CaseRecord(
+        pmid=pmid,
+        source_title=article.title,
+        source_url=str(article.pubmed_url),
+        publication_date=article.publication_date,
+        journal=article.journal,
+        doi=article.doi,
+        disease_label=DiseaseLabel.ECD,
+        case_count=1,
+        cns_involvement=True,
+        mutation="BRAF V600E",
+        therapies=["dabrafenib", "trametinib"],
+        therapy_timing=TherapyTiming.EARLY,
+        neurologic_outcome="neurologic improvement",
+        supporting_text=(
+            "Dabrafenib and trametinib were started early with neurologic improvement."
+        ),
+        source_fields_used=["abstract"],
+        limitations=["n=1"],
+        abstract_limited=True,
+        extractor_model="test-model",
+        extractor_prompt_version=EXTRACTOR_PROMPT_VERSION,
+        validation_status="validated",
+    )
+
+
+def test_run_case_corpus_with_injected_dependencies(tmp_path) -> None:
+    articles = [_article("11111111"), _article("22222222")]
+
+    def search_fn(query: str, max_results: int) -> list[str]:
+        return ["11111111", "22222222"]
+
+    def fetch_fn(pmids: list[str]) -> list[PubMedArticle]:
+        return articles
+
+    def extract_fn(article: PubMedArticle, question: str) -> list[CaseRecord]:
+        return [_case_record(article.pmid)]
+
+    result = run_case_corpus(
+        "CNS ECD BRAF therapy timing",
+        save=True,
+        db_path=str(tmp_path / "cases.db"),
+        search_fn=search_fn,
+        fetch_fn=fetch_fn,
+        extract_fn=extract_fn,
+        max_articles_to_extract=2,
+    )
+
+    assert len(result.pmids) == 2
+    assert len(result.case_records) == 2
+    assert result.aggregation is not None
+    assert result.aggregation.records_analyzed == 2
+    assert result.run_id is not None
+    assert result.warnings

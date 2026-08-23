@@ -21,7 +21,7 @@ See also [MISSION.md](MISSION.md) and [USER_GUIDE.md](USER_GUIDE.md).
 | M6 Research loop | **Done** | Quick=1 round, Deep=2 rounds + trials + optional extract/save |
 | M7 Evidence critic | **Done** | Deterministic critic labels before synthesis |
 | M8 Synthesis + CLI report | **Done** | Markdown report from critiqued EvidenceRecords |
-| M9 Case corpus aggregation | **Next** | Structured fields across case reports/series; no invented stats |
+| M9 Case corpus aggregation | **Done** (this branch) | `CaseRecord`, extract, aggregate, critic, `cases_cli` |
 | M10 Evidence strength scoring | **Planned** | Internal heuristic ranking; categorical user-facing labels |
 | M11 Full-text research | **Planned** | PMC, open access, user PDFs; section-aware chunking |
 | M12 Citation network research | **Planned** | References, citing articles, author search, seminal-paper traversal |

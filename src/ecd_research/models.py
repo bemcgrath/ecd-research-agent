@@ -93,6 +93,68 @@ class ValidationResult(BaseModel):
     record: EvidenceRecord | None = None
 
 
+class DiseaseLabel(str, Enum):
+    """Disease context as reported in source (never inferred beyond text)."""
+
+    ECD = "ecd"
+    LCH = "lch"
+    MIXED = "mixed"
+    HISTIOCYTOSIS_UNSPECIFIED = "histiocytosis_unspecified"
+    UNKNOWN = "unknown"
+
+
+class TherapyTiming(str, Enum):
+    """Timing of targeted therapy relative to diagnosis/symptoms, when source supports."""
+
+    EARLY = "early"
+    DELAYED = "delayed"
+    NOT_REPORTED = "not_reported"
+    UNCLEAR = "unclear"
+
+
+class CaseRecord(BaseModel):
+    """Structured fields from a case report or small case series."""
+
+    pmid: str
+    source_title: str | None = None
+    source_url: str
+    publication_date: str | None = None
+    journal: str | None = None
+    doi: str | None = None
+
+    disease_label: DiseaseLabel | None = None
+    case_count: int | None = None
+    organ_involvement: list[str] = Field(default_factory=list)
+    cns_involvement: bool | None = None
+
+    mutation: str | None = None
+    therapies: list[str] = Field(default_factory=list)
+
+    symptoms_to_diagnosis: str | None = None
+    diagnosis_to_treatment: str | None = None
+    therapy_timing: TherapyTiming | None = None
+
+    neurologic_outcome: str | None = None
+    other_outcomes: str | None = None
+
+    supporting_text: str
+    source_fields_used: list[Literal["title", "abstract"]] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
+
+    abstract_limited: bool = True
+    extractor_model: str
+    extractor_prompt_version: str
+    validation_status: Literal["pending", "validated", "rejected"] = "pending"
+
+
+class CaseValidationResult(BaseModel):
+    """Outcome of provenance validation for one CaseRecord."""
+
+    ok: bool
+    errors: list[str] = Field(default_factory=list)
+    record: CaseRecord | None = None
+
+
 class ClinicalTrial(BaseModel):
     """A ClinicalTrials.gov study record (API v2 fields only; never inferred)."""
 
