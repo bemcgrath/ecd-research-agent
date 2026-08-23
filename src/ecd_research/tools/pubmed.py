@@ -162,26 +162,72 @@ def parse_pubmed_xml(xml_text: str) -> list[PubMedArticle]:
     return articles
 
 
-def search_pubmed(query: str, max_results: int = 20) -> list[str]:
-    """Search PubMed and return PMIDs newest-first (NCBI pub_date sort)."""
+DATE_PATTERN = re.compile(r"^\d{4}(/\d{2}(/\d{2})?)?$")
+
+
+def _validate_search_args(query: str, max_results: int) -> str:
     if not isinstance(query, str) or not query.strip():
         raise ValueError("query must be a non-empty string")
     if not isinstance(max_results, int) or max_results < 1:
         raise ValueError("max_results must be an integer >= 1")
+    return query.strip()
 
-    params = _ncbi_params(
-        db="pubmed",
-        term=query.strip(),
-        retmax=max_results,
-        retmode="json",
-        sort="pub_date",
-    )
+
+def _validate_ncbi_date(value: str, field_name: str) -> str:
+    if not isinstance(value, str) or not DATE_PATTERN.fullmatch(value.strip()):
+        raise ValueError(
+            f"{field_name} must be YYYY, YYYY/MM, or YYYY/MM/DD (got {value!r})"
+        )
+    return value.strip()
+
+
+def _esearch_pmids(params: dict[str, Any]) -> list[str]:
     response = _get("esearch.fcgi", params)
     payload = response.json()
     id_list = payload.get("esearchresult", {}).get("idlist", [])
     if not isinstance(id_list, list):
         return []
     return [str(pmid) for pmid in id_list]
+
+
+def search_pubmed(query: str, max_results: int = 20) -> list[str]:
+    """Search PubMed and return PMIDs newest-first (NCBI pub_date sort)."""
+    term = _validate_search_args(query, max_results)
+    params = _ncbi_params(
+        db="pubmed",
+        term=term,
+        retmax=max_results,
+        retmode="json",
+        sort="pub_date",
+    )
+    return _esearch_pmids(params)
+
+
+def search_pubmed_by_date(
+    query: str,
+    start_date: str,
+    end_date: str,
+    max_results: int = 100,
+) -> list[str]:
+    """Search PubMed within a publication-date range (NCBI mindate/maxdate).
+
+    Dates must be YYYY, YYYY/MM, or YYYY/MM/DD as accepted by E-utilities.
+    Date filtering is performed by NCBI; local code does not invent dates.
+    """
+    term = _validate_search_args(query, max_results)
+    mindate = _validate_ncbi_date(start_date, "start_date")
+    maxdate = _validate_ncbi_date(end_date, "end_date")
+    params = _ncbi_params(
+        db="pubmed",
+        term=term,
+        retmax=max_results,
+        retmode="json",
+        sort="pub_date",
+        datetype="pdat",
+        mindate=mindate,
+        maxdate=maxdate,
+    )
+    return _esearch_pmids(params)
 
 
 def get_pubmed_articles(pmids: list[str]) -> list[PubMedArticle]:

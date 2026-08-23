@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from enum import Enum
+from typing import Literal
+
 from pydantic import BaseModel, Field, HttpUrl
 
 
@@ -16,3 +19,75 @@ class PubMedArticle(BaseModel):
     abstract: str | None = None
     doi: str | None = None
     pubmed_url: HttpUrl
+
+
+class StudyType(str, Enum):
+    """Study design labels; never invent a design not supported by the source."""
+
+    PROSPECTIVE_CONTROLLED_TRIAL = "prospective_controlled_trial"
+    PROSPECTIVE_SINGLE_ARM_TRIAL = "prospective_single_arm_trial"
+    RETROSPECTIVE_COHORT = "retrospective_cohort"
+    CASE_SERIES = "case_series"
+    CASE_REPORT = "case_report"
+    SYSTEMATIC_REVIEW = "systematic_review"
+    SCOPING_REVIEW = "scoping_review"
+    CONSENSUS_STATEMENT = "consensus_statement"
+    EXPERT_OPINION = "expert_opinion"
+    PREPRINT = "preprint"
+    CONFERENCE_ABSTRACT = "conference_abstract"
+    ANIMAL_STUDY = "animal_study"
+    IN_VITRO_STUDY = "in_vitro_study"
+    OTHER = "other"
+    UNKNOWN = "unknown"
+
+
+class EvidenceStrength(str, Enum):
+    """User-facing categorical strength (not a validated clinical grade)."""
+
+    HIGH = "high"
+    MODERATE = "moderate"
+    LOW = "low"
+    VERY_LOW = "very_low"
+    INSUFFICIENT = "insufficient"
+
+
+class EvidenceRecord(BaseModel):
+    """Atomic claim grounded in a single retrieved source article."""
+
+    claim: str
+
+    pmid: str
+    source_title: str | None = None
+    source_url: str
+    publication_date: str | None = None
+    journal: str | None = None
+    doi: str | None = None
+
+    study_type: StudyType | None = None
+    sample_size: int | None = None
+    population: str | None = None
+    intervention: str | None = None
+    comparator: str | None = None
+    outcome: str | None = None
+
+    supporting_text: str
+    supporting_text_start: int | None = None
+    supporting_text_end: int | None = None
+    source_fields_used: list[Literal["title", "abstract"]] = Field(default_factory=list)
+
+    limitations: list[str] = Field(default_factory=list)
+    evidence_strength: EvidenceStrength
+    reasoning_note: str
+
+    abstract_limited: bool = True
+    extractor_model: str
+    extractor_prompt_version: str
+    validation_status: Literal["pending", "validated", "rejected"] = "pending"
+
+
+class ValidationResult(BaseModel):
+    """Outcome of provenance validation for one EvidenceRecord."""
+
+    ok: bool
+    errors: list[str] = Field(default_factory=list)
+    record: EvidenceRecord | None = None

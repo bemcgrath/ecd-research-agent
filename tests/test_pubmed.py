@@ -11,6 +11,7 @@ from ecd_research.tools.pubmed import (
     get_pubmed_articles,
     parse_pubmed_xml,
     search_pubmed,
+    search_pubmed_by_date,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -116,3 +117,34 @@ def test_empty_pmid_list_skips_network() -> None:
     with patch("ecd_research.tools.pubmed._get") as mock_get:
         assert get_pubmed_articles([]) == []
         mock_get.assert_not_called()
+
+
+def test_search_pubmed_by_date_passes_ncbi_filters() -> None:
+    mock_response = MagicMock()
+    mock_response.json.return_value = {"esearchresult": {"idlist": ["42082348"]}}
+    mock_response.raise_for_status = MagicMock()
+
+    with patch("ecd_research.tools.pubmed._get", return_value=mock_response) as mock_get:
+        pmids = search_pubmed_by_date(
+            "Erdheim-Chester disease",
+            start_date="2024/01/01",
+            end_date="2026/12/31",
+            max_results=5,
+        )
+
+    assert pmids == ["42082348"]
+    params = mock_get.call_args[0][1]
+    assert params["datetype"] == "pdat"
+    assert params["mindate"] == "2024/01/01"
+    assert params["maxdate"] == "2026/12/31"
+    assert params["sort"] == "pub_date"
+    assert params["retmax"] == 5
+
+
+def test_search_pubmed_by_date_invalid_dates() -> None:
+    with pytest.raises(ValueError, match="start_date"):
+        search_pubmed_by_date("ECD", start_date="2024-01-01", end_date="2025/01/01")
+    with pytest.raises(ValueError, match="end_date"):
+        search_pubmed_by_date("ECD", start_date="2024", end_date="not-a-date")
+    with pytest.raises(ValueError, match="non-empty"):
+        search_pubmed_by_date("", start_date="2024", end_date="2025")
