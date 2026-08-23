@@ -12,4 +12,4 @@ Research aid only. Not diagnosis, not prescribing, not treatment instructions.
 
 ## Near-term path
 
-See [MASTER_PLAN.md](MASTER_PLAN.md) for milestone status through Milestone F and what is deferred.
+See [ROADMAP.md](ROADMAP.md) for milestone status through Milestone F and what is deferred.

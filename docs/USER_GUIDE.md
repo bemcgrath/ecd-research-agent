@@ -252,5 +252,5 @@ Those are clinical decisions for the care team.
 ## Learn more
 
 - Project story: [README.md](../README.md)
-- Roadmap: [MASTER_PLAN.md](MASTER_PLAN.md)
+- Roadmap: [ROADMAP.md](ROADMAP.md)
 - Short mission note: [MISSION.md](MISSION.md)

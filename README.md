@@ -63,7 +63,7 @@ The system is **not intended to replace physicians or make treatment decisions**
 
 Full setup and walkthrough: **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)**
 
-Roadmap and design: [docs/MASTER_PLAN.md](docs/MASTER_PLAN.md) · [docs/MISSION.md](docs/MISSION.md)
+Roadmap and design: [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/MISSION.md](docs/MISSION.md)
 
 ### Setup
 
