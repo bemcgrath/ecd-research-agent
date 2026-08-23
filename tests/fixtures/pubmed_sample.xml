@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2025//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_250101.dtd">
+<PubmedArticleSet>
+  <PubmedArticle>
+    <MedlineCitation Status="Publisher" Owner="NLM">
+      <PMID Version="1">99999999</PMID>
+      <Article PubModel="Print-Electronic">
+        <Journal>
+          <ISSN IssnType="Electronic">1234-5678</ISSN>
+          <JournalIssue CitedMedium="Internet">
+            <Volume>10</Volume>
+            <Issue>2</Issue>
+            <PubDate>
+              <Year>2026</Year>
+              <Month>Aug</Month>
+              <Day>15</Day>
+            </PubDate>
+          </JournalIssue>
+          <Title>Example Journal of Rare Diseases</Title>
+          <ISOAbbreviation>Ex J Rare Dis</ISOAbbreviation>
+        </Journal>
+        <ArticleTitle>Complete Erdheim-Chester disease example article</ArticleTitle>
+        <ELocationID EIdType="doi" ValidYN="Y">10.1000/example.doi</ELocationID>
+        <Abstract>
+          <AbstractText Label="BACKGROUND" NlmCategory="BACKGROUND">Background text.</AbstractText>
+          <AbstractText Label="METHODS" NlmCategory="METHODS">Methods text.</AbstractText>
+        </Abstract>
+        <AuthorList CompleteYN="Y">
+          <Author ValidYN="Y">
+            <LastName>Smith</LastName>
+            <ForeName>Jane</ForeName>
+            <Initials>J</Initials>
+          </Author>
+          <Author ValidYN="Y">
+            <LastName>Doe</LastName>
+            <ForeName>John A</ForeName>
+            <Initials>JA</Initials>
+          </Author>
+          <Author ValidYN="Y">
+            <CollectiveName>ECD Study Group</CollectiveName>
+          </Author>
+        </AuthorList>
+        <Language>eng</Language>
+      </Article>
+    </MedlineCitation>
+    <PubmedData>
+      <PublicationStatus>aheadofprint</PublicationStatus>
+      <ArticleIdList>
+        <ArticleId IdType="pubmed">99999999</ArticleId>
+        <ArticleId IdType="doi">10.1000/example.doi</ArticleId>
+      </ArticleIdList>
+    </PubmedData>
+  </PubmedArticle>
+  <PubmedArticle>
+    <MedlineCitation Status="Publisher" Owner="NLM">
+      <PMID Version="1">88888888</PMID>
+      <Article PubModel="Electronic">
+        <Journal>
+          <JournalIssue CitedMedium="Internet">
+            <PubDate>
+              <MedlineDate>2025 Spring</MedlineDate>
+            </PubDate>
+          </JournalIssue>
+        </Journal>
+        <ArticleTitle>Sparse article with minimal metadata</ArticleTitle>
+      </Article>
+    </MedlineCitation>
+    <PubmedData>
+      <PublicationStatus>epublish</PublicationStatus>
+      <ArticleIdList>
+        <ArticleId IdType="pubmed">88888888</ArticleId>
+      </ArticleIdList>
+    </PubmedData>
+  </PubmedArticle>
+</PubmedArticleSet>
