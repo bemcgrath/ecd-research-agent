@@ -15,5 +15,5 @@ build/
 htmlcov/
 .DS_Store
 *.log
-data/*.db
-data/*.db-*
+research_report.md
+*.report.md

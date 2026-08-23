@@ -161,7 +161,8 @@ Roadmap and design notes: [docs/MASTER_PLAN.md](docs/MASTER_PLAN.md) · [docs/MI
 | Search strategy + ECD vocabulary | Available |
 | ClinicalTrials.gov API v2 | Available |
 | Multi-round research loop (Quick/Deep) | Available |
-| Critic, synthesis UI | Not yet |
+| Evidence critic + synthesis report | Available |
+| Streamlit UI / full-text / Agents SDK | Not yet |
 
 ## Setup
 
@@ -219,6 +220,12 @@ python -m ecd_research.research_cli --question "What is the current evidence for
 ```
 
 Omit `--no-extract` when `OPENAI_API_KEY` is set to also build validated evidence records.
+
+Generate a critiqued markdown report (Milestone F-style):
+
+```bash
+python -m ecd_research.report_cli --question "What is the current evidence for treating neurological involvement in Erdheim-Chester disease, and how does molecular status affect treatment evidence?" --mode deep --output research_report.md
+```
 ## Tests
 
 ```bash
