@@ -24,6 +24,7 @@ ecd-pubmed = "ecd_research.cli:main"
 ecd-evidence = "ecd_research.evidence_cli:main"
 ecd-strategy = "ecd_research.strategy_cli:main"
 ecd-trials = "ecd_research.trials_cli:main"
+ecd-research = "ecd_research.research_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

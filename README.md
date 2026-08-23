@@ -160,6 +160,7 @@ Roadmap and design notes: [docs/MASTER_PLAN.md](docs/MASTER_PLAN.md) · [docs/MI
 | SQLite evidence repository | Available (`--save` on evidence CLI) |
 | Search strategy + ECD vocabulary | Available |
 | ClinicalTrials.gov API v2 | Available |
+| Multi-round research loop (Quick/Deep) | Available |
 | Critic, synthesis UI | Not yet |
 
 ## Setup
@@ -210,6 +211,14 @@ Search ClinicalTrials.gov:
 ```bash
 python -m ecd_research.trials_cli --condition "Erdheim-Chester disease" --max-results 10
 ```
+
+Run Deep research (2 PubMed rounds + trials; add `--save` to persist):
+
+```bash
+python -m ecd_research.research_cli --question "What is the current evidence for treating neurological involvement in Erdheim-Chester disease, and how does molecular status affect treatment evidence?" --mode deep --no-extract
+```
+
+Omit `--no-extract` when `OPENAI_API_KEY` is set to also build validated evidence records.
 ## Tests
 
 ```bash

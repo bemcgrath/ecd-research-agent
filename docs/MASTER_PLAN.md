@@ -9,8 +9,8 @@
 | M2 Atomic evidence extraction | **Done** | `EvidenceRecord`, extract, provenance validator, adversarial tests |
 | M3 Evidence repository (SQLite) | **Done** | Persist articles, evidence, research questions/runs |
 | M4 Search strategy + ECD vocabulary | **Done** (this branch) | Config-driven YAML synonyms + PubMed query expansion |
-| M5 ClinicalTrials.gov | **Done** (this branch) | Official API v2 search/fetch; no inferred status |
-| M6 Research loop | Planned | Deep mode: at least two rounds |
+| M5 ClinicalTrials.gov | **Done** | Official API v2 search/fetch; no inferred status |
+| M6 Research loop | **Done** (this branch) | Quick=1 round, Deep=2 rounds + trials + optional extract/save |
 | M7 Evidence critic | Planned | Before synthesis |
 | M8 Synthesis + CLI report | Planned | Then stop and evaluate on benchmark |
 | M9+ | Deferred | Full-text, citation graph, UI, monitoring, KG after F |
