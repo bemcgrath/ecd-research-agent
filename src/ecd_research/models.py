@@ -91,3 +91,24 @@ class ValidationResult(BaseModel):
     ok: bool
     errors: list[str] = Field(default_factory=list)
     record: EvidenceRecord | None = None
+
+
+class ClinicalTrial(BaseModel):
+    """A ClinicalTrials.gov study record (API v2 fields only; never inferred)."""
+
+    nct_id: str
+    title: str | None = None
+    status: str | None = None
+    phase: str | None = None
+    interventions: list[str] = Field(default_factory=list)
+    conditions: list[str] = Field(default_factory=list)
+    eligibility: str | None = None
+    minimum_age: str | None = None
+    maximum_age: str | None = None
+    locations: list[str] = Field(default_factory=list)
+    sponsor: str | None = None
+    investigators: list[str] = Field(default_factory=list)
+    start_date: str | None = None
+    completion_date: str | None = None
+    last_update_date: str | None = None
+    url: str

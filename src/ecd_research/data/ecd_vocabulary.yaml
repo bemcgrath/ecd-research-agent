@@ -1,0 +1,59 @@
+disease:
+  - Erdheim-Chester disease
+  - Erdheim Chester disease
+  - ECD
+  - non-Langerhans cell histiocytosis
+  - histiocytic neoplasm
+
+molecular:
+  - BRAF
+  - BRAF V600E
+  - BRAFV600E
+  - BRAF fusion
+  - MAP2K1
+  - KRAS
+  - NRAS
+  - ARAF
+  - MAPK
+  - ERK
+  - RAF
+  - MEK
+  - PIK3CA
+
+treatment:
+  - vemurafenib
+  - dabrafenib
+  - cobimetinib
+  - trametinib
+  - BRAF inhibitor
+  - MEK inhibitor
+  - targeted therapy
+  - interferon
+  - cladribine
+  - anakinra
+  - infliximab
+  - mTOR
+
+organ:
+  - CNS
+  - neurologic
+  - neurological
+  - brain
+  - cerebellar
+  - cardiovascular
+  - cardiac
+  - pericardial
+  - periaortic
+  - retroperitoneal
+  - renal
+  - perirenal
+  - perinephric
+  - ureteral
+  - pulmonary
+  - orbital
+  - skeletal
+  - bone
+  - endocrine
+  - pituitary
+  - diabetes insipidus
+  - skin

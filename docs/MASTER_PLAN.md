@@ -7,9 +7,9 @@
 | M1 PubMed foundation | **Done** (merged to `main`) | Live E-utilities search/fetch; nullable metadata; field name `pubmed_url` |
 | M1.1 Date-range search | **Done** (this branch) | `search_pubmed_by_date` via NCBI mindate/maxdate |
 | M2 Atomic evidence extraction | **Done** | `EvidenceRecord`, extract, provenance validator, adversarial tests |
-| M3 Evidence repository (SQLite) | **Done** (this branch) | Persist articles, evidence, research questions/runs |
-| M4 Search strategy + ECD vocabulary | Planned | Config-driven synonyms; no hard-coded scatter |
-| M5 ClinicalTrials.gov | Planned (before full research loop) | Official API v2 only |
+| M3 Evidence repository (SQLite) | **Done** | Persist articles, evidence, research questions/runs |
+| M4 Search strategy + ECD vocabulary | **Done** (this branch) | Config-driven YAML synonyms + PubMed query expansion |
+| M5 ClinicalTrials.gov | **Done** (this branch) | Official API v2 search/fetch; no inferred status |
 | M6 Research loop | Planned | Deep mode: at least two rounds |
 | M7 Evidence critic | Planned | Before synthesis |
 | M8 Synthesis + CLI report | Planned | Then stop and evaluate on benchmark |

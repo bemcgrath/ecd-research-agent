@@ -158,7 +158,9 @@ Roadmap and design notes: [docs/MASTER_PLAN.md](docs/MASTER_PLAN.md) · [docs/MI
 | Date-range PubMed search | Available |
 | Atomic evidence extraction + provenance validation | Available (CLI; requires `OPENAI_API_KEY`) |
 | SQLite evidence repository | Available (`--save` on evidence CLI) |
-| ClinicalTrials.gov, critic, synthesis UI | Not yet |
+| Search strategy + ECD vocabulary | Available |
+| ClinicalTrials.gov API v2 | Available |
+| Critic, synthesis UI | Not yet |
 
 ## Setup
 
@@ -196,6 +198,18 @@ python -m ecd_research.evidence_cli --pmid 42624824 --question "What evidence ex
 ```
 
 Optional: set `ECD_DB_PATH` or pass `--db path/to/file.db`.
+
+Generate PubMed query expansions from a research question:
+
+```bash
+python -m ecd_research.strategy_cli --question "What is the evidence for treating neurological ECD with BRAF/MEK therapy?"
+```
+
+Search ClinicalTrials.gov:
+
+```bash
+python -m ecd_research.trials_cli --condition "Erdheim-Chester disease" --max-results 10
+```
 ## Tests
 
 ```bash
