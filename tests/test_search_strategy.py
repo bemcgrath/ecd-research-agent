@@ -19,6 +19,7 @@ def test_load_vocabulary_has_expected_categories() -> None:
     assert "treatment" in vocab
     assert "organ" in vocab
     assert "Erdheim-Chester disease" in vocab["disease"]
+    assert "Langerhans cell histiocytosis" in vocab["disease"]
     assert "BRAF V600E" in vocab["molecular"]
 
 

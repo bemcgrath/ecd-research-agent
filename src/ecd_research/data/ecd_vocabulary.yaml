@@ -2,8 +2,13 @@ disease:
   - Erdheim-Chester disease
   - Erdheim Chester disease
   - ECD
-  - non-Langerhans cell histiocytosis
+  - Langerhans cell histiocytosis
+  - Langerhans Cell Histiocytosis
+  - LCH
+  - mixed histiocytosis
+  - histiocytosis
   - histiocytic neoplasm
+  - non-Langerhans cell histiocytosis
 
 molecular:
   - BRAF

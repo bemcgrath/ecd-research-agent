@@ -12,12 +12,13 @@
 | M5 ClinicalTrials.gov | **Done** | Official API v2 search/fetch; no inferred status |
 | M6 Research loop | **Done** | Quick=1 round, Deep=2 rounds + trials + optional extract/save |
 | M7 Evidence critic | **Done** (this branch) | Deterministic critic labels before synthesis |
-| M8 Synthesis + CLI report | **Done** (this branch) | Markdown report from critiqued EvidenceRecords |
-| M9+ | Deferred | Full-text, citation graph, UI, monitoring, KG after F |
+| M8 Synthesis + CLI report | **Done** | Markdown report from critiqued EvidenceRecords |
+| M9 Case corpus aggregation | **Planned** | Structured fields across case reports/series; no invented stats |
+| M10+ | Deferred | Full-text, citation graph, UI, monitoring, KG |
 
 ## Mission
 
-Build an open-source AI research system for **Erdheim-Chester disease (ECD)** that systematically discovers, evaluates, connects, updates, and cites medical evidence.
+Build an open-source AI research system centered on **Erdheim-Chester disease (ECD)** that systematically discovers, evaluates, connects, updates, and cites medical evidence — including related **histiocytosis** literature (LCH, mixed disease) when relevant to a research question.
 
 The system should behave like a rigorous research analyst, not a generic medical chatbot.
 
@@ -102,9 +103,26 @@ Early outputs are **abstract-limited** until full-text ingestion exists.
 - **M7:** Critic (`SUPPORTED` / `PARTIALLY_SUPPORTED` / `UNSUPPORTED` / `CONTRADICTED`).
 - **M8:** Synthesis from validated records only; specialist questions section; clinical disclaimers.
 
-Then **stop and evaluate** on the neurological ECD + molecular status benchmark before M9+.
+Then **stop and evaluate** on the neurological ECD + molecular status benchmark (Milestone F — complete).
 
-## Deferred (After Milestone F)
+## Milestone 9 — Case corpus aggregation (Planned)
+
+**Goal:** Answer questions that require **many case reports**, not one paper at a time.
+
+Example benchmark question:
+
+> Across all published CNS-ECD cases, is earlier initiation of BRAF/MEK-targeted therapy associated with better neurologic recovery than delayed treatment?
+
+Implement:
+
+- `CaseRecord` model with fields only when present in source: disease label (ECD/LCH/mixed), organs, mutation, therapy, time from symptoms → diagnosis → treatment, neurologic outcomes, PMID, supporting text
+- Aggregation over validated case records (counts, tables, gaps — **never invented statistics**)
+- Include LCH and mixed histiocytosis papers when the research question warrants it; tag disease context per record
+- Critic rules: case reports cannot support population-level causation without sufficient series
+
+Depends on: M2–M8 (done). Improved by M10 full-text for timing/outcome fields often missing from abstracts.
+
+## Deferred (M10+)
 
 Full-text PMC/PDF, citation network, researcher/institution mapping, knowledge graph, time-aware supersession, patient-context matching (local-only privacy), continuous monitoring, Streamlit UI.
 
