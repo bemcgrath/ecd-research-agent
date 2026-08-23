@@ -157,6 +157,7 @@ Roadmap and design notes: [docs/MASTER_PLAN.md](docs/MASTER_PLAN.md) · [docs/MI
 | PubMed search/fetch (NCBI E-utilities) | Available |
 | Date-range PubMed search | Available |
 | Atomic evidence extraction + provenance validation | Available (CLI; requires `OPENAI_API_KEY`) |
+| SQLite evidence repository | Available (`--save` on evidence CLI) |
 | ClinicalTrials.gov, critic, synthesis UI | Not yet |
 
 ## Setup
@@ -188,6 +189,13 @@ Extract validated evidence claims for one PMID:
 python -m ecd_research.evidence_cli --pmid 42624824 --question "What evidence exists for diagnosing ECD?"
 ```
 
+Persist to local SQLite (`data/ecd_research.db` by default):
+
+```bash
+python -m ecd_research.evidence_cli --pmid 42624824 --question "What evidence exists for diagnosing ECD?" --save
+```
+
+Optional: set `ECD_DB_PATH` or pass `--db path/to/file.db`.
 ## Tests
 
 ```bash
