@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 from ecd_research.evidence.extractor import EXTRACTOR_PROMPT_VERSION, extract_evidence
 from ecd_research.models import ClinicalTrial, EvidenceRecord, PubMedArticle
+from ecd_research.research.article_selection import select_articles_for_extraction
 from ecd_research.research.search_strategy import SearchStrategy, generate_search_strategy
 from ecd_research.storage import EvidenceRepository
 from ecd_research.tools.clinical_trials import search_clinical_trials
@@ -61,6 +62,7 @@ def run_research(
     mode: ResearchMode = ResearchMode.DEEP,
     max_results_per_query: int = 10,
     max_articles_to_extract: int = 5,
+    extraction_scan_limit: int = 25,
     extract: bool = True,
     include_trials: bool = True,
     save: bool = False,
@@ -108,8 +110,15 @@ def run_research(
     articles = fetch_fn(ordered_pmids) if ordered_pmids else []
 
     evidence: list[EvidenceRecord] = []
+    extraction_targets: list[PubMedArticle] = []
     if extract and articles:
-        for article in articles[:max_articles_to_extract]:
+        extraction_targets = select_articles_for_extraction(
+            articles,
+            question.strip(),
+            max_articles=max_articles_to_extract,
+            scan_limit=extraction_scan_limit,
+        )
+        for article in extraction_targets:
             evidence.extend(extract_fn(article, question.strip()))
 
     trials: list[ClinicalTrial] = []
@@ -121,6 +130,7 @@ def run_research(
         f"rounds={len(rounds)}",
         f"unique_pmids={len(ordered_pmids)}",
         f"articles_fetched={len(articles)}",
+        f"articles_selected_for_extraction={len(extraction_targets)}",
         f"evidence_records={len(evidence)}",
         f"trials={len(trials)}",
         "Evidence extraction is abstract-limited until full-text support exists.",

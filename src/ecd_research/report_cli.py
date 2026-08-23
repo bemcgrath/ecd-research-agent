@@ -64,7 +64,19 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"Rounds: {len(result.rounds)}")
     print(f"PMIDs: {len(result.pmids)}")
+    selected = next(
+        (n.split("=", 1)[1] for n in result.notes if n.startswith("articles_selected_for_extraction=")),
+        "?",
+    )
+    print(f"Articles scanned for extraction: {selected} (with abstracts + relevance)")
     print(f"Evidence records: {len(result.evidence)}")
+    if len(result.evidence) == 0 and not args.no_extract:
+        print(
+            "\nNote: 0 evidence records usually means the top papers had no usable abstract "
+            "or no claims in the abstract matched your question. Try --max-extract 8 or re-run "
+            "after updating the tool.",
+            file=sys.stderr,
+        )
     print(f"Critique summary: {report.critique_summary}")
     print(f"Wrote report: {out.resolve()}")
     print("\nBOTTOM LINE")
