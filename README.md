@@ -150,6 +150,8 @@ Please never commit patient records, API keys, private medical information, or l
 
 Roadmap and design notes: [docs/MASTER_PLAN.md](docs/MASTER_PLAN.md) · [docs/MISSION.md](docs/MISSION.md)
 
+**How to use the tool:** [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
+
 ## Current Status
 
 | Area | Status |
@@ -165,6 +167,8 @@ Roadmap and design notes: [docs/MASTER_PLAN.md](docs/MASTER_PLAN.md) · [docs/MI
 | Streamlit UI / full-text / Agents SDK | Not yet |
 
 ## Setup
+
+See the full walkthrough in **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)**.
 
 ```bash
 python -m venv .venv
