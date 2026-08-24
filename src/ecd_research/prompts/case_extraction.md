@@ -27,6 +27,13 @@ Use `early`, `delayed`, `not_reported`, or `unclear` based on **when targeted th
 
 Do **not** label a case `early` merely because improvement was “rapid.”
 
+## supporting_text (critical)
+
+- Must be an **exact contiguous copy-paste** from the supplied source (title, abstract, or full_text).
+- Do **not** paraphrase, summarize, or join distant sentences with `...` / ellipsis.
+- Prefer one sentence (or two adjacent sentences) that grounds disease, therapy timing, and/or neurologic outcome.
+- If you cannot quote an exact span, omit the record.
+
 ## Output
 
 Return a JSON object with key `records` (array). Each record is one case or one homogeneous case series from this paper.
@@ -44,7 +51,7 @@ Each record must include:
 - therapy_timing (early|delayed|not_reported|unclear or null)
 - neurologic_outcome (string or null; include scores/timelines when stated)
 - other_outcomes (string or null)
-- supporting_text (verbatim or near-verbatim span from the supplied source grounding the extraction)
+- supporting_text (exact contiguous span from the supplied source)
 - source_fields_used (subset of ["title", "abstract", "full_text"])
 - limitations (array of strings)
 

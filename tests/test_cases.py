@@ -118,7 +118,7 @@ def test_validate_case_record_accepts_full_text_grounding() -> None:
     assert outcome.record.validation_status == "validated"
 
 
-def test_build_case_source_corpus_prefers_full_text() -> None:
+def test_build_case_source_corpus_includes_abstract_and_full_text() -> None:
     article = _article()
     full_text = FullTextDocument(
         pmid=article.pmid,
@@ -129,6 +129,7 @@ def test_build_case_source_corpus_prefers_full_text() -> None:
     )
     corpus = build_case_source_corpus(article, full_text)
     assert "Full text only sentence here." in corpus
+    assert "We report a 45-year-old patient" in corpus or "CNS Erdheim-Chester" in corpus
 
 
 def test_validate_case_record_accepts_grounded_record() -> None:

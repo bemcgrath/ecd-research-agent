@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from ecd_research.evidence.validator import build_source_corpus, normalize_text
 from ecd_research.models import (
     CaseRecord,
@@ -10,6 +12,8 @@ from ecd_research.models import (
     PubMedArticle,
 )
 from ecd_research.tools.pmc import build_fulltext_corpus
+
+_ELLIPSIS_RE = re.compile(r"\.{3}|…")
 
 
 def _urls_equivalent(left: str, right: str) -> bool:
@@ -20,10 +24,34 @@ def build_case_source_corpus(
     source_article: PubMedArticle,
     full_text: FullTextDocument | None = None,
 ) -> str:
-    """Build grounding corpus: title+abstract, or full text when available."""
-    if full_text is not None and full_text.raw_text.strip():
-        return build_fulltext_corpus(full_text)
-    return build_source_corpus(source_article)
+    """Build grounding corpus: title+abstract, plus full text when available."""
+    abstract_corpus = build_source_corpus(source_article)
+    if full_text is None or not full_text.raw_text.strip():
+        return abstract_corpus
+    full_corpus = build_fulltext_corpus(full_text)
+    # Keep PubMed abstract available so abstract-faithful quotes still validate.
+    parts = [p for p in (abstract_corpus, full_corpus) if p and p.strip()]
+    return "\n\n".join(parts)
+
+
+def _supporting_text_grounded(supporting_text: str, corpus: str) -> bool:
+    """Require an exact normalized span, or exact fragments if the model used ellipsis."""
+    if not supporting_text.strip() or not corpus.strip():
+        return False
+    norm_corpus = normalize_text(corpus)
+    norm_support = normalize_text(supporting_text)
+    if norm_support in norm_corpus:
+        return True
+
+    # Allow "sentence ... sentence" only when each substantial fragment is exact.
+    fragments = [
+        normalize_text(part)
+        for part in _ELLIPSIS_RE.split(supporting_text)
+        if len(normalize_text(part)) >= 40
+    ]
+    if len(fragments) >= 2 and all(frag in norm_corpus for frag in fragments):
+        return True
+    return False
 
 
 def validate_case_record(
@@ -73,7 +101,7 @@ def validate_case_record(
         corpus = build_case_source_corpus(source_article, full_text)
         if not corpus.strip():
             errors.append("source material has no text to ground extraction")
-        elif normalize_text(record.supporting_text) not in normalize_text(corpus):
+        elif not _supporting_text_grounded(record.supporting_text, corpus):
             errors.append("supporting_text not found in supplied source material")
 
     if record.case_count is not None and record.case_count < 1:
