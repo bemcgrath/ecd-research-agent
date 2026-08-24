@@ -40,3 +40,9 @@ def test_resolve_pmcid_from_fixture_xml_parsing_only() -> None:
     doc = parse_pmc_xml(xml_text)
     assert doc is not None
     assert doc.pmcid.startswith("PMC")
+
+
+def test_parse_pmc_xml_rejects_pmid_mismatch() -> None:
+    xml_text = FIXTURE.read_text(encoding="utf-8")
+    assert parse_pmc_xml(xml_text, pmid="41562816") is not None
+    assert parse_pmc_xml(xml_text, pmid="29096034") is None

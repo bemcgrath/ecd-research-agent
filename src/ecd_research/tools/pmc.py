@@ -53,7 +53,12 @@ def _element_text(element: ET.Element | None) -> str:
 
 
 def resolve_pmcid(pmid: str) -> str | None:
-    """Map a PubMed PMID to a PMCID via ELink, or None if not in PMC."""
+    """Map a PubMed PMID to a PMCID via ELink, or None if not in PMC.
+
+    Only accepts ``pubmed_pmc`` (same article in PMC). Ignores
+    ``pubmed_pmc_refs`` and other neighbor/citation link sets, which can
+    point at unrelated full texts.
+    """
     if not PMID_PATTERN.match(pmid):
         raise ValueError(f"Invalid PMID: {pmid!r}")
 
@@ -63,6 +68,7 @@ def resolve_pmcid(pmid: str) -> str | None:
             dbfrom="pubmed",
             db="pmc",
             id=pmid,
+            linkname="pubmed_pmc",
             retmode="json",
         ),
     )
@@ -70,6 +76,8 @@ def resolve_pmcid(pmid: str) -> str | None:
     for linkset in payload.get("linksets", []):
         for db in linkset.get("linksetdbs", []):
             if db.get("dbto") != "pmc":
+                continue
+            if db.get("linkname") and db.get("linkname") != "pubmed_pmc":
                 continue
             links = db.get("links") or []
             if links:
@@ -168,6 +176,10 @@ def parse_pmc_xml(xml_text: str, *, pmid: str | None = None) -> FullTextDocument
             doi = value
         elif id_type == "pmid":
             pmid_from_xml = value
+
+    if pmid is not None and pmid_from_xml is not None and pmid != pmid_from_xml:
+        # Refuse to attach another paper's PMC XML under the requested PMID.
+        return None
 
     resolved_pmid = pmid or pmid_from_xml
     if not resolved_pmid or not pmcid:
