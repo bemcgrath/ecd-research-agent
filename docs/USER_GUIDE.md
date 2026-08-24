@@ -171,6 +171,9 @@ Only **validated** claims are saved. Invented or unsupported text is dropped.
 | Trials search | `python -m ecd_research.trials_cli` |
 | Multi-round research | `python -m ecd_research.research_cli --question "..." --mode deep` |
 | Full report | `python -m ecd_research.report_cli --question "..." --output research_report.md` |
+| Case corpus (abstracts) | `python -m ecd_research.cases_cli --output case_corpus_report.md` |
+| Case corpus + PMC full text | `python -m ecd_research.cases_cli --full-text --save --output case_corpus_fulltext.md` |
+| Follow citations from a seed PMID | `python -m ecd_research.cases_cli --pmids 41562816 --expand-citations --full-text --max-extract 15` |
 | One-paper evidence | `python -m ecd_research.evidence_cli --pmid ... --question "..."` |
 | Run tests | `pytest` |
 

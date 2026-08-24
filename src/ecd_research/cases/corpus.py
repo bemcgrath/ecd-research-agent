@@ -13,6 +13,7 @@ from ecd_research.cases.selection import select_case_report_articles
 from ecd_research.models import CaseRecord, FullTextDocument, PubMedArticle
 from ecd_research.research.search_strategy import SearchStrategy, generate_search_strategy
 from ecd_research.storage import EvidenceRepository
+from ecd_research.tools.citations import expand_citation_neighborhood
 from ecd_research.tools.pmc import fetch_pmc_full_text
 from ecd_research.tools.pubmed import get_pubmed_articles, search_pubmed
 
@@ -27,6 +28,7 @@ class CaseCorpusRunResult(BaseModel):
     selected_articles: list[PubMedArticle] = Field(default_factory=list)
     case_records: list[CaseRecord] = Field(default_factory=list)
     full_text_pmids: list[str] = Field(default_factory=list)
+    citation_expanded_pmids: list[str] = Field(default_factory=list)
     aggregation: CaseAggregationResult | None = None
     warnings: list[str] = Field(default_factory=list)
     question_id: int | None = None
@@ -66,6 +68,12 @@ def run_case_corpus(
     fetch_fn: Callable[[list[str]], list[PubMedArticle]] = get_pubmed_articles,
     extract_fn: Callable[..., list[CaseRecord]] = extract_case_records,
     full_text_fn: Callable[[str], FullTextDocument | None] = fetch_pmc_full_text,
+    expand_citations: bool = False,
+    citation_seeds: list[str] | None = None,
+    citation_expand_fn: Callable[..., tuple[list[str], dict[str, list[str]]]] = (
+        expand_citation_neighborhood
+    ),
+    max_citation_neighbors: int = 40,
 ) -> CaseCorpusRunResult:
     """Search PubMed, extract structured case records, and aggregate.
 
@@ -107,6 +115,32 @@ def run_case_corpus(
             scan_limit=extraction_scan_limit,
         )
 
+    citation_expanded_pmids: list[str] = []
+    if expand_citations:
+        seeds = citation_seeds if citation_seeds is not None else [
+            a.pmid for a in selected
+        ]
+        if not seeds and ordered_pmids:
+            seeds = ordered_pmids[:5]
+        if seeds:
+            citation_expanded_pmids, _audit = citation_expand_fn(
+                seeds,
+                max_per_seed=max_citation_neighbors,
+                max_total=max_citation_neighbors,
+            )
+            new_only = [p for p in citation_expanded_pmids if p not in seen]
+            if new_only:
+                extra_articles = fetch_fn(new_only)
+                articles = articles + extra_articles
+                ordered_pmids = ordered_pmids + new_only
+                seen.update(new_only)
+                selected = select_case_report_articles(
+                    articles,
+                    cleaned,
+                    max_articles=max_articles_to_extract,
+                    scan_limit=max(extraction_scan_limit, len(articles)),
+                )
+
     case_records: list[CaseRecord] = []
     full_text_pmids: list[str] = []
     for article in selected:
@@ -133,6 +167,8 @@ def run_case_corpus(
         f"validated_records={aggregation.records_analyzed}",
         f"use_full_text={use_full_text}",
         f"full_text_available={len(full_text_pmids)}",
+        f"citation_expand={expand_citations}",
+        f"citation_neighbors={len(citation_expanded_pmids)}",
         f"abstract_limited_records={abstract_limited_count}",
         "Research aid only — not a diagnosis or treatment recommendation.",
     ]
@@ -153,7 +189,9 @@ def run_case_corpus(
                 extractor_prompt_version=EXTRACTOR_PROMPT_VERSION if case_records else None,
                 notes=(
                     f"case_corpus run use_full_text={use_full_text} "
-                    f"full_text_n={len(full_text_pmids)}"
+                    f"full_text_n={len(full_text_pmids)} "
+                    f"citation_expand={expand_citations} "
+                    f"citation_neighbors={len(citation_expanded_pmids)}"
                 ),
             )
             if strategy is not None:
@@ -170,6 +208,13 @@ def run_case_corpus(
                     query=f"pmids:{','.join(ordered_pmids)}",
                     source="pubmed",
                     pmids=ordered_pmids,
+                )
+            if expand_citations and citation_expanded_pmids:
+                repo.add_search_query(
+                    run_id,
+                    query="elink:pubmed_pubmed_refs+citedin",
+                    source="pubmed_elink",
+                    pmids=citation_expanded_pmids,
                 )
             for article in articles:
                 repo.upsert_article(article)
@@ -188,6 +233,7 @@ def run_case_corpus(
         selected_articles=selected,
         case_records=case_records,
         full_text_pmids=full_text_pmids,
+        citation_expanded_pmids=citation_expanded_pmids,
         aggregation=aggregation,
         warnings=warnings,
         question_id=question_id,

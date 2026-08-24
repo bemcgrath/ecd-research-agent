@@ -40,6 +40,25 @@ def main(argv: list[str] | None = None) -> int:
         help="Use PMC open-access full text when available (falls back to abstract)",
     )
     parser.add_argument(
+        "--expand-citations",
+        action="store_true",
+        help=(
+            "Follow PubMed references and citing articles from seed PMIDs "
+            "(or from selected case reports) to find additional papers"
+        ),
+    )
+    parser.add_argument(
+        "--citation-seeds",
+        default=None,
+        help="Comma-separated PMIDs used as citation-expansion seeds (default: selected papers)",
+    )
+    parser.add_argument(
+        "--max-citation-neighbors",
+        type=int,
+        default=40,
+        help="Max unique neighbor PMIDs from citation expansion (default: 40)",
+    )
+    parser.add_argument(
         "--max-results-per-query",
         type=int,
         default=15,
@@ -78,13 +97,21 @@ def main(argv: list[str] | None = None) -> int:
     if args.pmids:
         pmid_list = [p.strip() for p in args.pmids.split(",") if p.strip()]
 
+    citation_seeds: list[str] | None = None
+    if args.citation_seeds:
+        citation_seeds = [p.strip() for p in args.citation_seeds.split(",") if p.strip()]
+
     print(
         "Disclaimer: research aid only. Not a diagnosis or treatment recommendation.\n"
     )
     print(f"Question: {args.question}")
     if pmid_list:
         print(f"PMIDs: {', '.join(pmid_list)}")
-    print(f"Full text: {'yes (PMC when available)' if args.full_text else 'no (abstract only)'}\n")
+    print(f"Full text: {'yes (PMC when available)' if args.full_text else 'no (abstract only)'}")
+    print(f"Citation expand: {'yes' if args.expand_citations else 'no'}")
+    if citation_seeds:
+        print(f"Citation seeds: {', '.join(citation_seeds)}")
+    print()
 
     result = run_case_corpus(
         args.question,
@@ -93,6 +120,9 @@ def main(argv: list[str] | None = None) -> int:
         extraction_scan_limit=args.scan_limit,
         use_full_text=args.full_text,
         pmids=pmid_list,
+        expand_citations=args.expand_citations,
+        citation_seeds=citation_seeds,
+        max_citation_neighbors=args.max_citation_neighbors,
         save=args.save,
         db_path=args.db,
     )
@@ -110,6 +140,7 @@ def main(argv: list[str] | None = None) -> int:
     output_path.write_text(markdown, encoding="utf-8")
 
     print(f"PMIDs found: {len(result.pmids)}")
+    print(f"Citation neighbors added: {len(result.citation_expanded_pmids)}")
     print(f"Case reports selected: {len(result.selected_articles)}")
     print(f"Full-text available: {len(result.full_text_pmids)}")
     if result.full_text_pmids:

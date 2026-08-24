@@ -108,10 +108,10 @@ Aggregate structured fields across case reports:
 python -m ecd_research.cases_cli --question "Across published CNS-ECD cases, what does the literature report about timing of BRAF/MEK-targeted therapy and neurologic outcomes?" --output case_corpus_report.md
 ```
 
-Re-run on specific PMIDs with PMC full text when available:
+Follow references and citing articles from a seed paper, then extract with full text:
 
 ```bash
-python -m ecd_research.cases_cli --pmids 41562816,40131415 --full-text --save --output case_corpus_report.md
+python -m ecd_research.cases_cli --pmids 41562816 --expand-citations --citation-seeds 41562816 --full-text --max-extract 15 --save --output case_corpus_citations.md
 ```
 
 Other CLIs: query expansion (`strategy_cli`), trials (`trials_cli`), multi-round search (`research_cli`), single-paper evidence (`evidence_cli`). See the [user guide](docs/USER_GUIDE.md).
@@ -136,7 +136,8 @@ pytest
 | Evidence critic + synthesis report | Available |
 | Case corpus aggregation (structured case series) | Available (`cases_cli`) |
 | PMC full-text case extraction | Available (`cases_cli --full-text`) |
-| Streamlit UI / full-text / Agents SDK | Not yet |
+| Citation neighborhood (refs + citing articles) | Available (`cases_cli --expand-citations`) |
+| Streamlit UI / Agents SDK | Not yet |
 
 ## Join the effort
 
