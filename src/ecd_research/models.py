@@ -112,6 +112,27 @@ class TherapyTiming(str, Enum):
     UNCLEAR = "unclear"
 
 
+class FullTextSection(BaseModel):
+    """One section of a full-text article with provenance retained."""
+
+    title: str | None = None
+    text: str
+    section_type: str | None = None  # e.g. body / abstract / back
+
+
+class FullTextDocument(BaseModel):
+    """Open-access full text retrieved from PubMed Central (or compatible source)."""
+
+    pmid: str
+    pmcid: str
+    title: str | None = None
+    doi: str | None = None
+    source_url: str
+    sections: list[FullTextSection] = Field(default_factory=list)
+    raw_text: str = ""
+    abstract_limited: bool = False
+
+
 class CaseRecord(BaseModel):
     """Structured fields from a case report or small case series."""
 
@@ -138,13 +159,16 @@ class CaseRecord(BaseModel):
     other_outcomes: str | None = None
 
     supporting_text: str
-    source_fields_used: list[Literal["title", "abstract"]] = Field(default_factory=list)
+    source_fields_used: list[Literal["title", "abstract", "full_text"]] = Field(
+        default_factory=list
+    )
     limitations: list[str] = Field(default_factory=list)
 
     abstract_limited: bool = True
     extractor_model: str
     extractor_prompt_version: str
     validation_status: Literal["pending", "validated", "rejected"] = "pending"
+    pmcid: str | None = None
 
 
 class CaseValidationResult(BaseModel):

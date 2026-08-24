@@ -15,10 +15,12 @@ from ecd_research.cases.extractor import (
     extract_case_records,
 )
 from ecd_research.cases.selection import select_case_report_articles
-from ecd_research.cases.validator import validate_case_record
+from ecd_research.cases.validator import build_case_source_corpus, validate_case_record
 from ecd_research.models import (
     CaseRecord,
     DiseaseLabel,
+    FullTextDocument,
+    FullTextSection,
     PubMedArticle,
     TherapyTiming,
 )
@@ -76,6 +78,57 @@ def _case_record(**overrides: object) -> CaseRecord:
     }
     base.update(overrides)
     return CaseRecord(**base)  # type: ignore[arg-type]
+
+
+def test_validate_case_record_accepts_full_text_grounding() -> None:
+    article = _article()
+    full_text = FullTextDocument(
+        pmid=article.pmid,
+        pmcid="PMC12821489",
+        title=article.title,
+        doi=article.doi,
+        source_url="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12821489/",
+        sections=[
+            FullTextSection(
+                title="Outcome",
+                text=(
+                    "After seven months of dabrafenib and trametinib, partial neurologic "
+                    "improvement was observed."
+                ),
+            )
+        ],
+        raw_text=(
+            "After seven months of dabrafenib and trametinib, partial neurologic "
+            "improvement was observed."
+        ),
+        abstract_limited=False,
+    )
+    record = _case_record(
+        supporting_text=(
+            "After seven months of dabrafenib and trametinib, partial neurologic "
+            "improvement was observed."
+        ),
+        source_fields_used=["full_text"],
+        abstract_limited=False,
+        pmcid="PMC12821489",
+    )
+    outcome = validate_case_record(record, article, full_text=full_text)
+    assert outcome.ok is True
+    assert outcome.record is not None
+    assert outcome.record.validation_status == "validated"
+
+
+def test_build_case_source_corpus_prefers_full_text() -> None:
+    article = _article()
+    full_text = FullTextDocument(
+        pmid=article.pmid,
+        pmcid="PMC999",
+        source_url="https://example.com/pmc/PMC999/",
+        sections=[FullTextSection(title="Body", text="Full text only sentence here.")],
+        raw_text="Full text only sentence here.",
+    )
+    corpus = build_case_source_corpus(article, full_text)
+    assert "Full text only sentence here." in corpus
 
 
 def test_validate_case_record_accepts_grounded_record() -> None:

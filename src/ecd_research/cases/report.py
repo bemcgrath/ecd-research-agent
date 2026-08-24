@@ -42,6 +42,9 @@ def render_case_corpus_markdown(
             f"- Therapy timing reported: **{aggregation.timing_reported}** "
             f"(early: {aggregation.early_therapy}, delayed: {aggregation.delayed_therapy})",
             f"- Neurologic outcome reported: **{aggregation.neurologic_outcome_reported}**",
+            f"- Abstract-limited records: "
+            f"**{sum(1 for r in aggregation.records if r.abstract_limited)}** / "
+            f"**{aggregation.records_analyzed}**",
             "",
         ]
     )

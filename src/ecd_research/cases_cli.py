@@ -30,6 +30,16 @@ def main(argv: list[str] | None = None) -> int:
         help="Research question guiding case selection and extraction",
     )
     parser.add_argument(
+        "--pmids",
+        default=None,
+        help="Comma-separated PMIDs to extract (skip PubMed search)",
+    )
+    parser.add_argument(
+        "--full-text",
+        action="store_true",
+        help="Use PMC open-access full text when available (falls back to abstract)",
+    )
+    parser.add_argument(
         "--max-results-per-query",
         type=int,
         default=15,
@@ -64,16 +74,25 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    pmid_list: list[str] | None = None
+    if args.pmids:
+        pmid_list = [p.strip() for p in args.pmids.split(",") if p.strip()]
+
     print(
         "Disclaimer: research aid only. Not a diagnosis or treatment recommendation.\n"
     )
-    print(f"Question: {args.question}\n")
+    print(f"Question: {args.question}")
+    if pmid_list:
+        print(f"PMIDs: {', '.join(pmid_list)}")
+    print(f"Full text: {'yes (PMC when available)' if args.full_text else 'no (abstract only)'}\n")
 
     result = run_case_corpus(
         args.question,
         max_results_per_query=args.max_results_per_query,
         max_articles_to_extract=args.max_extract,
         extraction_scan_limit=args.scan_limit,
+        use_full_text=args.full_text,
+        pmids=pmid_list,
         save=args.save,
         db_path=args.db,
     )
@@ -92,6 +111,9 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"PMIDs found: {len(result.pmids)}")
     print(f"Case reports selected: {len(result.selected_articles)}")
+    print(f"Full-text available: {len(result.full_text_pmids)}")
+    if result.full_text_pmids:
+        print(f"  PMIDs with PMC text: {', '.join(result.full_text_pmids)}")
     print(f"Case records extracted: {len(result.case_records)}")
     print(f"Validated records: {result.aggregation.records_analyzed}")
     print(f"Report written to: {output_path.resolve()}")

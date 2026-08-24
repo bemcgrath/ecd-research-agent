@@ -23,7 +23,7 @@ See also [MISSION.md](MISSION.md) and [USER_GUIDE.md](USER_GUIDE.md).
 | M8 Synthesis + CLI report | **Done** | Markdown report from critiqued EvidenceRecords |
 | M9 Case corpus aggregation | **Done** (this branch) | `CaseRecord`, extract, aggregate, critic, `cases_cli` |
 | M10 Evidence strength scoring | **Planned** | Internal heuristic ranking; categorical user-facing labels |
-| M11 Full-text research | **Planned** | PMC, open access, user PDFs; section-aware chunking |
+| M11 Full-text research | **In progress** | PMC open-access via E-utilities; `--full-text` on `cases_cli` |
 | M12 Citation network research | **Planned** | References, citing articles, author search, seminal-paper traversal |
 | M13 Researcher & institution mapping | **Planned** | Expert/trial investigator discovery; label metrics honestly |
 | M14 Knowledge graph | **Planned** | Relational entities first (PostgreSQL); Neo4j only if justified |
@@ -355,7 +355,7 @@ Every source directly openable; every claim traceable to EvidenceRecord → supp
 | Tier | Examples | Use |
 | --- | --- | --- |
 | 1 — Primary | PubMed original research, trials, FDA/NIH, ClinicalTrials.gov | Primary evidence |
-| 2 — Synthesis | Guidelines, systematic reviews, major academic centers | High-quality secondary |
+| 2 — Synthesis | Guidelines, systematic reviews, UpToDate clinical topics, major academic centers | High-quality secondary (link only; do not scrape paywalled text) |
 | 3 — ECD-specialized | ECD Global Alliance, registries, specialty conferences | Context + leads |
 | 4 — Emerging | Case reports, conference abstracts, preprints | Valuable in rare disease; label strength honestly |
 | 5 — Discovery | General web, communities, social media | Research leads only — rarely primary evidence |

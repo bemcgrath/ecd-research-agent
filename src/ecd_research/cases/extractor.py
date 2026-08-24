@@ -15,13 +15,15 @@ from ecd_research.cases.validator import validate_case_record
 from ecd_research.models import (
     CaseRecord,
     DiseaseLabel,
+    FullTextDocument,
     PubMedArticle,
     TherapyTiming,
 )
+from ecd_research.tools.pmc import build_fulltext_corpus
 
 load_dotenv()
 
-EXTRACTOR_PROMPT_VERSION = "v1"
+EXTRACTOR_PROMPT_VERSION = "v2"
 DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / "case_extraction.md"
 
@@ -39,7 +41,9 @@ class _ExtractedCase(BaseModel):
     neurologic_outcome: str | None = None
     other_outcomes: str | None = None
     supporting_text: str
-    source_fields_used: list[Literal["title", "abstract"]] = Field(default_factory=list)
+    source_fields_used: list[Literal["title", "abstract", "full_text"]] = Field(
+        default_factory=list
+    )
     limitations: list[str] = Field(default_factory=list)
 
 
@@ -51,8 +55,11 @@ def _load_system_prompt() -> str:
     return PROMPT_PATH.read_text(encoding="utf-8")
 
 
-def _article_payload(article: PubMedArticle) -> dict[str, Any]:
-    return {
+def _article_payload(
+    article: PubMedArticle,
+    full_text: FullTextDocument | None = None,
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
         "pmid": article.pmid,
         "title": article.title,
         "journal": article.journal,
@@ -62,6 +69,14 @@ def _article_payload(article: PubMedArticle) -> dict[str, Any]:
         "pubmed_url": str(article.pubmed_url),
         "authors": article.authors,
     }
+    if full_text is not None:
+        payload["pmcid"] = full_text.pmcid
+        payload["full_text_url"] = full_text.source_url
+        payload["full_text"] = build_fulltext_corpus(full_text)
+        payload["source_mode"] = "full_text"
+    else:
+        payload["source_mode"] = "abstract_only"
+    return payload
 
 
 def _call_openai(
@@ -70,13 +85,15 @@ def _call_openai(
     article: PubMedArticle,
     model: str,
     client: OpenAI,
+    full_text: FullTextDocument | None = None,
 ) -> _CaseExtractionPayload:
     user_content = json.dumps(
         {
             "research_question": research_question,
-            "article": _article_payload(article),
+            "article": _article_payload(article, full_text),
             "instructions": (
-                "Extract structured case fields grounded in the supplied article. "
+                "Extract structured case fields grounded only in the supplied source. "
+                "When full_text is present, use it for timing and outcome detail. "
                 "Return JSON matching the schema."
             ),
         },
@@ -101,7 +118,12 @@ def _to_case_record(
     article: PubMedArticle,
     *,
     model: str,
+    full_text: FullTextDocument | None = None,
 ) -> CaseRecord:
+    fields = list(extracted.source_fields_used)
+    if full_text is not None and "full_text" not in fields:
+        fields.append("full_text")
+
     return CaseRecord(
         pmid=article.pmid,
         source_title=article.title,
@@ -121,12 +143,13 @@ def _to_case_record(
         neurologic_outcome=extracted.neurologic_outcome,
         other_outcomes=extracted.other_outcomes,
         supporting_text=extracted.supporting_text,
-        source_fields_used=extracted.source_fields_used,
+        source_fields_used=fields,  # type: ignore[arg-type]
         limitations=extracted.limitations,
-        abstract_limited=True,
+        abstract_limited=full_text is None,
         extractor_model=model,
         extractor_prompt_version=EXTRACTOR_PROMPT_VERSION,
         validation_status="pending",
+        pmcid=full_text.pmcid if full_text else None,
     )
 
 
@@ -137,8 +160,12 @@ def extract_case_records(
     model: str | None = None,
     client: OpenAI | None = None,
     validate: bool = True,
+    full_text: FullTextDocument | None = None,
 ) -> list[CaseRecord]:
-    """Extract structured case records from one article for a research question."""
+    """Extract structured case records from one article for a research question.
+
+    When ``full_text`` is provided, extraction and provenance use the full text corpus.
+    """
     if not isinstance(research_question, str) or not research_question.strip():
         raise ValueError("research_question must be a non-empty string")
 
@@ -149,15 +176,18 @@ def extract_case_records(
         article=article,
         model=model_name,
         client=openai_client,
+        full_text=full_text,
     )
 
     results: list[CaseRecord] = []
     for extracted in payload.records:
-        record = _to_case_record(extracted, article, model=model_name)
+        record = _to_case_record(
+            extracted, article, model=model_name, full_text=full_text
+        )
         if not validate:
             results.append(record)
             continue
-        outcome = validate_case_record(record, article)
+        outcome = validate_case_record(record, article, full_text=full_text)
         if outcome.ok and outcome.record is not None:
             results.append(outcome.record)
     return results

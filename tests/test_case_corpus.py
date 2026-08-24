@@ -7,6 +7,8 @@ from ecd_research.cases.extractor import EXTRACTOR_PROMPT_VERSION
 from ecd_research.models import (
     CaseRecord,
     DiseaseLabel,
+    FullTextDocument,
+    FullTextSection,
     PubMedArticle,
     TherapyTiming,
 )
@@ -65,7 +67,9 @@ def test_run_case_corpus_with_injected_dependencies(tmp_path) -> None:
     def fetch_fn(pmids: list[str]) -> list[PubMedArticle]:
         return articles
 
-    def extract_fn(article: PubMedArticle, question: str) -> list[CaseRecord]:
+    def extract_fn(
+        article: PubMedArticle, question: str, *, full_text=None
+    ) -> list[CaseRecord]:
         return [_case_record(article.pmid)]
 
     result = run_case_corpus(
@@ -84,3 +88,45 @@ def test_run_case_corpus_with_injected_dependencies(tmp_path) -> None:
     assert result.aggregation.records_analyzed == 2
     assert result.run_id is not None
     assert result.warnings
+
+
+def test_run_case_corpus_with_full_text_injection(tmp_path) -> None:
+    articles = [_article("41562816")]
+
+    full_text = FullTextDocument(
+        pmid="41562816",
+        pmcid="PMC12821489",
+        source_url="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12821489/",
+        sections=[
+            FullTextSection(
+                title="Outcome",
+                text="Dabrafenib and trametinib started 6 years after symptom onset.",
+            )
+        ],
+        raw_text="Dabrafenib and trametinib started 6 years after symptom onset.",
+    )
+
+    def fetch_fn(pmids: list[str]) -> list[PubMedArticle]:
+        return articles
+
+    def full_text_fn(pmid: str) -> FullTextDocument | None:
+        return full_text if pmid == "41562816" else None
+
+    def extract_fn(
+        article: PubMedArticle, question: str, *, full_text=None
+    ) -> list[CaseRecord]:
+        assert full_text is not None
+        return [_case_record(article.pmid)]
+
+    result = run_case_corpus(
+        "CNS ECD BRAF therapy timing",
+        pmids=["41562816"],
+        use_full_text=True,
+        fetch_fn=fetch_fn,
+        full_text_fn=full_text_fn,
+        extract_fn=extract_fn,
+    )
+
+    assert result.full_text_pmids == ["41562816"]
+    assert len(result.case_records) == 1
+    assert any("full_text_available=1" in n for n in result.notes)

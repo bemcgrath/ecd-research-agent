@@ -1,14 +1,14 @@
-# Case Extraction Prompt (v1)
+# Case Extraction Prompt (v2)
 
 You extract **structured case-level fields** from a single PubMed case report or case series for a research question.
 
 ## Absolute rules
 
-- Use ONLY the supplied article metadata, title, and abstract.
+- Use ONLY the supplied source material (title, abstract, and full text when provided).
 - Do NOT use prior medical knowledge to fill gaps.
 - Do NOT invent citations, PMIDs, DOIs, mutations, treatments, timings, outcomes, or case counts.
 - If a field is not stated in the supplied text, leave it null.
-- This extraction is **abstract-limited**; do not imply full-text review occurred.
+- When full text is provided, prefer precise intervals and outcome scores from the body over vague abstract wording.
 - Never infer population-level causation or efficacy from one case.
 - The system is a research aid, not a clinician: never write treatment instructions.
 
@@ -16,9 +16,16 @@ You extract **structured case-level fields** from a single PubMed case report or
 
 Use one of: `ecd`, `lch`, `mixed`, `histiocytosis_unspecified`, `unknown` — only when the source supports it.
 
-## Therapy timing
+## Therapy timing (critical)
 
-Use `early`, `delayed`, `not_reported`, or `unclear` only when the abstract describes timing relative to symptoms, diagnosis, or neurologic decline. Do not guess.
+Use `early`, `delayed`, `not_reported`, or `unclear` based on **when targeted therapy started relative to symptom onset or diagnosis**, not how fast the patient responded.
+
+- `early` — source describes prompt/early initiation after symptoms or diagnosis
+- `delayed` — source describes delayed initiation (months/years later), late diagnosis, or delayed targeted therapy
+- `not_reported` — therapies mentioned but timing relative to symptoms/diagnosis not stated
+- `unclear` — timing language is ambiguous
+
+Do **not** label a case `early` merely because improvement was “rapid.”
 
 ## Output
 
@@ -35,10 +42,10 @@ Each record must include:
 - symptoms_to_diagnosis (string or null; duration or description as reported)
 - diagnosis_to_treatment (string or null; duration or description as reported)
 - therapy_timing (early|delayed|not_reported|unclear or null)
-- neurologic_outcome (string or null)
+- neurologic_outcome (string or null; include scores/timelines when stated)
 - other_outcomes (string or null)
-- supporting_text (verbatim or near-verbatim span from title/abstract grounding the extraction)
-- source_fields_used (subset of ["title", "abstract"])
-- limitations (array of strings; e.g. abstract-limited, n=1)
+- supporting_text (verbatim or near-verbatim span from the supplied source grounding the extraction)
+- source_fields_used (subset of ["title", "abstract", "full_text"])
+- limitations (array of strings)
 
 If the article is not a case report/series relevant to the question, return `{"records": []}`.

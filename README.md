@@ -51,6 +51,11 @@ The system is **not intended to replace physicians or make treatment decisions**
 - [Orphanet — LCH](https://www.orpha.net/consor/cgi-bin/ICDExp.php?lng=EN&Expert=263730)
 - [PubMed — ECD literature search](https://pubmed.ncbi.nlm.nih.gov/?term=Erdheim-Chester+disease)
 
+**Authoritative clinical references** (subscription may be required; not ingested by the agent — use for orientation and specialist context)
+
+- [UpToDate — Erdheim-Chester disease](https://www.uptodate.com/contents/erdheim-chester-disease) — peer-reviewed clinical topic summary (updated regularly)
+- [Blood — ECD consensus recommendations (2020)](https://doi.org/10.1182/blood.2019003507) — open-access expert consensus on evaluation, diagnosis, and treatment
+
 **Organizations**
 
 - [ECD Global Alliance](https://www.erdheim-chester.org/) — ECD patient advocacy, education, and community
@@ -99,6 +104,12 @@ Aggregate structured fields across case reports:
 python -m ecd_research.cases_cli --question "Across published CNS-ECD cases, what does the literature report about timing of BRAF/MEK-targeted therapy and neurologic outcomes?" --output case_corpus_report.md
 ```
 
+Re-run on specific PMIDs with PMC full text when available:
+
+```bash
+python -m ecd_research.cases_cli --pmids 41562816,40131415 --full-text --save --output case_corpus_report.md
+```
+
 Other CLIs: query expansion (`strategy_cli`), trials (`trials_cli`), multi-round search (`research_cli`), single-paper evidence (`evidence_cli`). See the [user guide](docs/USER_GUIDE.md).
 
 ### Tests
@@ -120,6 +131,7 @@ pytest
 | Multi-round research loop (Quick/Deep) | Available |
 | Evidence critic + synthesis report | Available |
 | Case corpus aggregation (structured case series) | Available (`cases_cli`) |
+| PMC full-text case extraction | Available (`cases_cli --full-text`) |
 | Streamlit UI / full-text / Agents SDK | Not yet |
 
 ## Join the effort
