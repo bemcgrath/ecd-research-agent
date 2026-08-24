@@ -51,10 +51,10 @@ The system is **not intended to replace physicians or make treatment decisions**
 - [Orphanet — LCH](https://www.orpha.net/consor/cgi-bin/ICDExp.php?lng=EN&Expert=263730)
 - [PubMed — ECD literature search](https://pubmed.ncbi.nlm.nih.gov/?term=Erdheim-Chester+disease)
 
-**Authoritative clinical references** (subscription may be required; not ingested by the agent — use for orientation and specialist context)
+**Authoritative clinical references** (for people with access — the agent does not ingest paywalled content)
 
-- [UpToDate — Erdheim-Chester disease](https://www.uptodate.com/contents/erdheim-chester-disease) — peer-reviewed clinical topic summary (updated regularly)
-- [Blood — ECD consensus recommendations (2020)](https://doi.org/10.1182/blood.2019003507) — open-access expert consensus on evaluation, diagnosis, and treatment
+- [UpToDate — Erdheim-Chester disease](https://www.uptodate.com/contents/erdheim-chester-disease) — peer-reviewed clinical summary; **paid subscription required** (many hospitals provide access for patients and staff)
+- [Blood — ECD consensus recommendations (2020)](https://doi.org/10.1182/blood.2019003507) — **free/open** expert consensus on evaluation, diagnosis, and treatment
 
 **Organizations**
 
