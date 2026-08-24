@@ -2,7 +2,7 @@
 
 This document is the north-star roadmap. **Milestones 1–8 and A–F are complete.** **M9 (case aggregation) is next.** Milestones 10–18 carry the original long-term vision with full detail.
 
-See also [MISSION.md](MISSION.md) and [USER_GUIDE.md](USER_GUIDE.md).
+See also [MISSION.md](MISSION.md), [USER_GUIDE.md](USER_GUIDE.md), and [GLOSSARY.md](GLOSSARY.md).
 
 ---
 

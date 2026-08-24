@@ -13,3 +13,5 @@ Research aid only. Not diagnosis, not prescribing, not treatment instructions.
 ## Near-term path
 
 See [ROADMAP.md](ROADMAP.md) for milestone status through Milestone F and what is deferred.
+
+Family- and contributor-facing terms: [GLOSSARY.md](GLOSSARY.md).

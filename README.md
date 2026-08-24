@@ -43,6 +43,8 @@ The system is **not intended to replace physicians or make treatment decisions**
 
 ## Learn more (patients, families, and contributors)
 
+**In this repo:** [Glossary of terms](docs/GLOSSARY.md) (BRAF, MEK, CNS, PMID, case-table columns, and more)
+
 **About the diseases**
 
 - [NIH — Erdheim-Chester disease (GARD)](https://rarediseases.info.nih.gov/diseases/6318/erdheim-chester-disease)
@@ -69,6 +71,8 @@ The system is **not intended to replace physicians or make treatment decisions**
 Full setup and walkthrough: **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)**
 
 Roadmap and design: [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/MISSION.md](docs/MISSION.md)
+
+Plain-language terms (BRAF, MEK, PMID, Sx→Dx, and more): **[docs/GLOSSARY.md](docs/GLOSSARY.md)**
 
 ### Setup
 

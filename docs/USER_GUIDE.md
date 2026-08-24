@@ -9,6 +9,8 @@ It is a **research aid**, not a doctor.
 - Urgent symptoms need **urgent medical care**.
 - Use outputs to prepare questions for an **ECD specialist**, and verify every important claim against the cited source.
 
+Unfamiliar terms (BRAF, MEK, PMID, Sx→Dx, abstract-limited, etc.): **[GLOSSARY.md](GLOSSARY.md)**.
+
 ---
 
 ## What you need
@@ -252,5 +254,6 @@ Those are clinical decisions for the care team.
 ## Learn more
 
 - Project story: [README.md](../README.md)
+- Glossary: [GLOSSARY.md](GLOSSARY.md)
 - Roadmap: [ROADMAP.md](ROADMAP.md)
 - Short mission note: [MISSION.md](MISSION.md)
