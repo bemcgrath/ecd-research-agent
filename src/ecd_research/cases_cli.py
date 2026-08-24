@@ -147,6 +147,21 @@ def main(argv: list[str] | None = None) -> int:
         print(f"  PMIDs with PMC text: {', '.join(result.full_text_pmids)}")
     print(f"Case records extracted: {len(result.case_records)}")
     print(f"Validated records: {result.aggregation.records_analyzed}")
+    if result.aggregation.records_analyzed_unique is not None:
+        print(
+            f"Unique single-case/small-series: "
+            f"{result.aggregation.records_analyzed_unique}"
+        )
+    print(f"Likely duplicate pairs: {len(result.aggregation.duplicate_pairs)}")
+    for kept, dup in result.aggregation.duplicate_pairs:
+        print(f"  {dup} ≈ {kept}")
+    print(
+        f"Review/large-series rows: {len(result.aggregation.review_series_table_rows)}"
+    )
+    print(
+        f"Timing (unique cases): early={result.aggregation.early_therapy}, "
+        f"delayed={result.aggregation.delayed_therapy}"
+    )
     print(f"Report written to: {output_path.resolve()}")
     if args.save and result.run_id is not None:
         print(f"Saved to database (run id: {result.run_id})")

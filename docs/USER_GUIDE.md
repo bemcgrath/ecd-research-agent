@@ -174,8 +174,15 @@ Only **validated** claims are saved. Invented or unsupported text is dropped.
 | Case corpus (abstracts) | `python -m ecd_research.cases_cli --output case_corpus_report.md` |
 | Case corpus + PMC full text | `python -m ecd_research.cases_cli --full-text --save --output case_corpus_fulltext.md` |
 | Follow citations from a seed PMID | `python -m ecd_research.cases_cli --pmids 41562816 --expand-citations --full-text --max-extract 15` |
+| Multi-seed expand → master table | `python -m ecd_research.cases_cli --pmids 41562816,30225465,40131415 --expand-citations --citation-seeds 41562816,30225465,40131415 --full-text --max-extract 20 --output case_corpus_master.md` |
 | One-paper evidence | `python -m ecd_research.evidence_cli --pmid ... --question "..."` |
 | Run tests | `pytest` |
+
+Case corpus cleanup notes:
+
+- **Multi-seed expansion** — comma-separated `--citation-seeds` / `--pmids` expand neighbors from each seed (neighbor budget is split across seeds). Explicit seeds are always kept in the extract set before neighbors fill remaining `--max-extract` slots.
+- **Same-patient duplicates** — rows that share mutation, therapy timing, and overlapping neurologic scores/timeline text are **marked** (not merged). Unique-patient timing counts exclude the secondary PMID.
+- **Reviews / large series** — rows with large `n` (or review-style titles) appear in a separate table so they are not counted as individual patients.
 
 On some Windows setups, console scripts like `ecd-pubmed` may be blocked by application control. Prefer `python -m ecd_research...` if that happens.
 

@@ -54,6 +54,36 @@ def _extract_with_optional_full_text(
     return records, full_text
 
 
+def _select_with_priority(
+    articles: list[PubMedArticle],
+    question: str,
+    *,
+    priority_pmids: list[str],
+    max_articles: int,
+    scan_limit: int,
+) -> list[PubMedArticle]:
+    """Keep explicit seeds/PMIDs first, then fill remaining slots by case-report score."""
+    by_pmid = {a.pmid: a for a in articles}
+    selected: list[PubMedArticle] = []
+    seen: set[str] = set()
+    for pmid in priority_pmids:
+        if pmid in by_pmid and pmid not in seen:
+            selected.append(by_pmid[pmid])
+            seen.add(pmid)
+            if len(selected) >= max_articles:
+                return selected
+
+    remainder = [a for a in articles if a.pmid not in seen]
+    filler = select_case_report_articles(
+        remainder,
+        question,
+        max_articles=max_articles - len(selected),
+        scan_limit=max(scan_limit, len(remainder)),
+    )
+    selected.extend(filler)
+    return selected
+
+
 def run_case_corpus(
     question: str,
     *,
@@ -122,10 +152,22 @@ def run_case_corpus(
         ]
         if not seeds and ordered_pmids:
             seeds = ordered_pmids[:5]
+        # Deduplicate seeds while preserving order (multi-seed CLI).
         if seeds:
+            seed_seen: set[str] = set()
+            cleaned_seeds: list[str] = []
+            for s in seeds:
+                s = s.strip()
+                if s and s not in seed_seen:
+                    seed_seen.add(s)
+                    cleaned_seeds.append(s)
+            seeds = cleaned_seeds
+        if seeds:
+            # Spread neighbor budget across seeds so one paper does not dominate.
+            per_seed = max(1, max_citation_neighbors // max(1, len(seeds)))
             citation_expanded_pmids, _audit = citation_expand_fn(
                 seeds,
-                max_per_seed=max_citation_neighbors,
+                max_per_seed=per_seed,
                 max_total=max_citation_neighbors,
             )
             new_only = [p for p in citation_expanded_pmids if p not in seen]
@@ -134,12 +176,21 @@ def run_case_corpus(
                 articles = articles + extra_articles
                 ordered_pmids = ordered_pmids + new_only
                 seen.update(new_only)
-                selected = select_case_report_articles(
-                    articles,
-                    cleaned,
-                    max_articles=max_articles_to_extract,
-                    scan_limit=max(extraction_scan_limit, len(articles)),
+            # Always prefer explicit --pmids / --citation-seeds over neighbor ranking.
+            priority = list(
+                dict.fromkeys(
+                    (pmids or [])
+                    + seeds
+                    + [a.pmid for a in selected]
                 )
+            )
+            selected = _select_with_priority(
+                articles,
+                cleaned,
+                priority_pmids=priority,
+                max_articles=max_articles_to_extract,
+                scan_limit=max(extraction_scan_limit, len(articles)),
+            )
 
     case_records: list[CaseRecord] = []
     full_text_pmids: list[str] = []
@@ -165,6 +216,9 @@ def run_case_corpus(
         f"case_reports_selected={len(selected)}",
         f"case_records={len(case_records)}",
         f"validated_records={aggregation.records_analyzed}",
+        f"unique_case_records={aggregation.records_analyzed_unique}",
+        f"duplicate_pairs={len(aggregation.duplicate_pairs)}",
+        f"review_or_series_rows={len(aggregation.review_series_table_rows)}",
         f"use_full_text={use_full_text}",
         f"full_text_available={len(full_text_pmids)}",
         f"citation_expand={expand_citations}",

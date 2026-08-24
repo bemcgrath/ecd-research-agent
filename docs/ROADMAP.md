@@ -21,10 +21,10 @@ See also [MISSION.md](MISSION.md), [USER_GUIDE.md](USER_GUIDE.md), and [GLOSSARY
 | M6 Research loop | **Done** | Quick=1 round, Deep=2 rounds + trials + optional extract/save |
 | M7 Evidence critic | **Done** | Deterministic critic labels before synthesis |
 | M8 Synthesis + CLI report | **Done** | Markdown report from critiqued EvidenceRecords |
-| M9 Case corpus aggregation | **Done** (this branch) | `CaseRecord`, extract, aggregate, critic, `cases_cli` |
+| M9 Case corpus aggregation | **Done** | `CaseRecord`, extract, aggregate, critic, `cases_cli`; duplicate marking + review/series split |
 | M10 Evidence strength scoring | **Planned** | Internal heuristic ranking; categorical user-facing labels |
 | M11 Full-text research | **In progress** | PMC open-access via E-utilities; `--full-text` on `cases_cli` |
-| M12 Citation network research | **In progress** | PubMed ELink refs + cited-in; `cases_cli --expand-citations` |
+| M12 Citation network research | **In progress** | PubMed ELink refs + cited-in; multi-seed `--expand-citations` + master table cleanup |
 | M13 Researcher & institution mapping | **Planned** | Expert/trial investigator discovery; label metrics honestly |
 | M14 Knowledge graph | **Planned** | Relational entities first (PostgreSQL); Neo4j only if justified |
 | M15 Time-aware evidence | **Planned** | Supersession, guideline versions, “what changed since …?” |

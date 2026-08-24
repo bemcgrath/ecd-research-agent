@@ -114,6 +114,12 @@ Follow references and citing articles from a seed paper, then extract with full 
 python -m ecd_research.cases_cli --pmids 41562816 --expand-citations --citation-seeds 41562816 --full-text --max-extract 15 --save --output case_corpus_citations.md
 ```
 
+Multi-seed citation expansion (seeds kept first; neighbors fill remaining slots), with duplicate marking and review/series separation in the report:
+
+```bash
+python -m ecd_research.cases_cli --pmids 41562816,30225465,40131415 --expand-citations --citation-seeds 41562816,30225465,40131415 --full-text --max-extract 20 --save --output case_corpus_master.md
+```
+
 Other CLIs: query expansion (`strategy_cli`), trials (`trials_cli`), multi-round search (`research_cli`), single-paper evidence (`evidence_cli`). See the [user guide](docs/USER_GUIDE.md).
 
 ### Tests

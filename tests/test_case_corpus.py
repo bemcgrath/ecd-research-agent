@@ -164,3 +164,56 @@ def test_run_case_corpus_citation_expansion_adds_neighbors() -> None:
     assert result.citation_expanded_pmids == ["99900001"]
     assert {a.pmid for a in result.selected_articles} >= {"41562816", "99900001"}
     assert any("citation_neighbors=1" in n for n in result.notes)
+
+
+def test_run_case_corpus_multi_seed_prioritizes_seeds() -> None:
+    seeds = [_article("41562816"), _article("30225465"), _article("40131415")]
+    neighbor = PubMedArticle(
+        pmid="99900002",
+        title="Unrelated high-scoring case report CNS ECD BRAF dabrafenib trametinib",
+        authors=["X"],
+        journal="Case Reports",
+        publication_date="2024",
+        abstract=(
+            "We report a patient with CNS Erdheim-Chester disease and BRAF V600E. "
+            "Dabrafenib and trametinib were started early with neurologic improvement. "
+            "Case report of cerebellar involvement."
+        ),
+        doi=None,
+        pubmed_url="https://pubmed.ncbi.nlm.nih.gov/99900002/",
+    )
+
+    by_id = {a.pmid: a for a in seeds}
+    by_id["99900002"] = neighbor
+
+    def fetch_fn(pmids: list[str]) -> list[PubMedArticle]:
+        return [by_id[p] for p in pmids if p in by_id]
+
+    def extract_fn(
+        article: PubMedArticle, question: str, *, full_text=None
+    ) -> list[CaseRecord]:
+        return [_case_record(article.pmid)]
+
+    def citation_expand_fn(seed_list, **kwargs):
+        assert seed_list == ["41562816", "30225465", "40131415"]
+        assert kwargs.get("max_total") == 40
+        # Budget spread across 3 seeds
+        assert kwargs.get("max_per_seed") == 13
+        return ["99900002"], {seed_list[0]: ["99900002"]}
+
+    result = run_case_corpus(
+        "CNS ECD BRAF therapy timing",
+        pmids=["41562816", "30225465", "40131415"],
+        expand_citations=True,
+        citation_seeds=["41562816", "30225465", "40131415"],
+        fetch_fn=fetch_fn,
+        extract_fn=extract_fn,
+        citation_expand_fn=citation_expand_fn,
+        max_articles_to_extract=3,
+        max_citation_neighbors=40,
+    )
+
+    selected_pmids = [a.pmid for a in result.selected_articles]
+    assert selected_pmids == ["41562816", "30225465", "40131415"]
+    assert "99900002" not in selected_pmids
+    assert result.citation_expanded_pmids == ["99900002"]
