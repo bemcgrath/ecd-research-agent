@@ -74,27 +74,45 @@ ClinicalTrials.gov study ID (starts with `NCT`).
 
 ---
 
-## Treatments you will see in papers
+## Treatments you will see in papers (and on the bottle)
 
-These names appear in literature. Listing them is **not** a recommendation.
+Research papers almost always use the **generic** (scientific) name. Prescriptions, pharmacy labels, and family conversations usually use the **brand** name. Same medicine — two names.
+
+Listing a drug here is **not** a recommendation. Brand names below are common U.S. names; other countries may use different brands. Whether a drug is approved for ECD specifically is a question for the care team (for example, **Zelboraf** has an FDA indication for BRAF V600-mutant ECD; others may be used off-label or under other labeled uses).
 
 **Targeted therapy**  
 A drug aimed at a molecular pathway (here, usually MAPK), rather than traditional broad chemotherapy alone.
 
+### Names families recognize
+
+| What a paper says (generic) | What a patient may hear (brand) | Class |
+| --- | --- | --- |
+| vemurafenib | **Zelboraf** | BRAF inhibitor |
+| dabrafenib | **Tafinlar** | BRAF inhibitor |
+| trametinib | **Mekinist** | MEK inhibitor |
+| cobimetinib | **Cotellic** | MEK inhibitor |
+| binimetinib | **Mektovi** | MEK inhibitor |
+| cladribine | **Mavenclad** (oral MS product) or **Leustatin** / generic infusions in older cancer/histiocytosis use — ask the pharmacy which product was given | chemotherapy-type |
+| interferon-alpha / pegylated interferon | **Intron A**, **Roferon-A**, **Pegasys**, and others (many interferon products) | immune-signaling drug |
+| corticosteroids / steroids | **prednisone**, **dexamethasone**, **methylprednisolone** (many brand and generic versions) | anti-inflammatory |
+
 **BRAF inhibitor**  
-Drugs such as **vemurafenib** or **dabrafenib** used when a BRAF V600 mutation is present (in published series and labels/indications that apply to histiocytosis).
+Turns down an overactive BRAF signal. Papers: vemurafenib, dabrafenib. Bottles: Zelboraf, Tafinlar.
 
 **MEK inhibitor**  
-Drugs such as **cobimetinib**, **trametinib**, or **binimetinib** that block MEK, downstream of BRAF. Used in BRAF-mutant disease (often with a BRAF inhibitor) or in some BRAF-wild-type MAPK-mutant disease.
+Turns down MEK, a step after BRAF on the same pathway. Papers: cobimetinib, trametinib, binimetinib. Bottles: Cotellic, Mekinist, Mektovi. Used with a BRAF inhibitor in some BRAF-mutant disease, or alone in some BRAF-negative MAPK-mutant disease.
 
 **Dab/Tra (dabrafenib + trametinib)**  
-A common BRAF + MEK combination reported in mixed LCH/ECD and other MAPK-driven histiocytosis.
+The combination **Tafinlar + Mekinist**. Common in papers on mixed LCH/ECD and other MAPK-driven histiocytosis.
+
+**Zelboraf + Cotellic**  
+The combination **vemurafenib + cobimetinib**. You may see this pairing in melanoma literature; ECD papers more often discuss Zelboraf alone or other MAPK combinations — check the specific paper.
 
 **Cladribine**  
-A chemotherapy-type drug used in some histiocytosis cases, including CNS disease, in published reports.
+A chemotherapy-type drug used in some histiocytosis cases, including CNS disease, in published reports. Confirm the exact product name with the treating team; “cladribine” is not always the same pill as Mavenclad.
 
 **Interferon-alpha**  
-An older systemic therapy still mentioned in historical ECD papers.
+An older systemic therapy still mentioned in historical ECD papers. Brand names vary.
 
 **Steroids (corticosteroids)**  
 Anti-inflammatory drugs. Papers often note they help little or only briefly in ECD.
