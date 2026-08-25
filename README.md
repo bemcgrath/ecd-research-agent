@@ -43,7 +43,7 @@ The system is **not intended to replace physicians or make treatment decisions**
 
 ## Learn more (patients, families, and contributors)
 
-**In this repo:** [Glossary of terms](docs/GLOSSARY.md) (BRAF, MEK, CNS, PMID, case-table columns, and more)
+**In this repo:** [Glossary of terms](docs/GLOSSARY.md) (BRAF, MEK, CNS, PMID, case-table columns, and more) · [Case corpus walkthrough](docs/CASE_CORPUS_WALKTHROUGH.md) (plain-language early vs delayed therapy from the current master table)
 
 **About the diseases**
 
@@ -73,6 +73,8 @@ Full setup and walkthrough: **[docs/USER_GUIDE.md](docs/USER_GUIDE.md)**
 Roadmap and design: [docs/ROADMAP.md](docs/ROADMAP.md) · [docs/MISSION.md](docs/MISSION.md)
 
 Plain-language terms (BRAF, MEK, PMID, Sx→Dx, and more): **[docs/GLOSSARY.md](docs/GLOSSARY.md)**
+
+Family-facing read of the current master case table (early vs delayed therapy): **[docs/CASE_CORPUS_WALKTHROUGH.md](docs/CASE_CORPUS_WALKTHROUGH.md)**
 
 ### Setup
 

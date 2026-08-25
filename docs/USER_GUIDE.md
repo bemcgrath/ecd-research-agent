@@ -9,7 +9,7 @@ It is a **research aid**, not a doctor.
 - Urgent symptoms need **urgent medical care**.
 - Use outputs to prepare questions for an **ECD specialist**, and verify every important claim against the cited source.
 
-Unfamiliar terms (BRAF, MEK, PMID, Sx→Dx, abstract-limited, etc.): **[GLOSSARY.md](GLOSSARY.md)**.
+Unfamiliar terms (BRAF, MEK, PMID, Sx→Dx, abstract-limited, etc.): **[GLOSSARY.md](GLOSSARY.md)**. Plain-language early vs delayed therapy walkthrough of the master case corpus: **[CASE_CORPUS_WALKTHROUGH.md](CASE_CORPUS_WALKTHROUGH.md)**.
 
 ---
 
@@ -183,6 +183,7 @@ Case corpus cleanup notes:
 - **Multi-seed expansion** — comma-separated `--citation-seeds` / `--pmids` expand neighbors from each seed (neighbor budget is split across seeds). Explicit seeds are always kept in the extract set before neighbors fill remaining `--max-extract` slots.
 - **Same-patient duplicates** — rows that share mutation, therapy timing, and overlapping neurologic scores/timeline text are **marked** (not merged). Unique-patient timing counts exclude the secondary PMID.
 - **Reviews / large series** — rows with large `n` (or review-style titles) appear in a separate table so they are not counted as individual patients.
+- **Family walkthrough** — see [CASE_CORPUS_WALKTHROUGH.md](CASE_CORPUS_WALKTHROUGH.md) for a plain-language read of early vs delayed timing in the current master extract.
 
 On some Windows setups, console scripts like `ecd-pubmed` may be blocked by application control. Prefer `python -m ecd_research...` if that happens.
 
@@ -265,5 +266,6 @@ Those are clinical decisions for the care team.
 
 - Project story: [README.md](../README.md)
 - Glossary: [GLOSSARY.md](GLOSSARY.md)
+- Case corpus walkthrough (early vs delayed therapy, plain language): [CASE_CORPUS_WALKTHROUGH.md](CASE_CORPUS_WALKTHROUGH.md)
 - Roadmap: [ROADMAP.md](ROADMAP.md)
 - Short mission note: [MISSION.md](MISSION.md)
