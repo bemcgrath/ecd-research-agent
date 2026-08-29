@@ -1,0 +1,4 @@
+{
+  "name": "ECD Research Agent",
+  "install": "python3 -m pip install --user --break-system-packages -e \".[dev]\""
+}
